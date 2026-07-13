@@ -35,6 +35,45 @@ class LearningSystemValidationTests(unittest.TestCase):
             [],
         )
 
+    def test_core_references_expose_required_contracts(self):
+        reference_names = [
+            "persona.md",
+            "philosophy.md",
+            "workflow.md",
+            "discovery.md",
+            "goal-analysis.md",
+            "gap-analysis.md",
+        ]
+        reference_paths = [
+            self.skill_root / "references" / name for name in reference_names
+        ]
+        missing = [path.name for path in reference_paths if not path.is_file()]
+        self.assertEqual(missing, [], f"Missing core reference files: {missing}")
+
+        combined_text = "\n".join(
+            path.read_text(encoding="utf-8") for path in reference_paths
+        )
+        required_tokens = [
+            "Learning System Architect",
+            "not a course recommender",
+            "not_applicable",
+            "needs_input",
+            "Strength",
+            "Weakness",
+            "Opportunity",
+            "Risk",
+            "SMART",
+            "OKR",
+            "Backward Design",
+            "source",
+            "confidence",
+            "affected_downstream",
+        ]
+        missing_tokens = [
+            token for token in required_tokens if token not in combined_text
+        ]
+        self.assertEqual(missing_tokens, [], f"Missing contract tokens: {missing_tokens}")
+
     def test_curriculum_cycle_is_rejected(self):
         errors = self.validator.validate_learner_system(
             self.skill_root, self.fixtures / "invalid-cycle"
