@@ -116,6 +116,43 @@ class LearningSystemValidationTests(unittest.TestCase):
             [],
         )
 
+    def test_skill_entrypoint_exposes_progressive_workflow_contract(self):
+        skill_path = self.skill_root / "SKILL.md"
+        self.assertTrue(skill_path.is_file(), f"Missing Skill entrypoint: {skill_path}")
+
+        text = skill_path.read_text(encoding="utf-8")
+        self.assertTrue(text.startswith("---\n"))
+        _, frontmatter_text, body = text.split("---", 2)
+        frontmatter = yaml.safe_load(frontmatter_text)
+        self.assertEqual(set(frontmatter), {"name", "description"})
+        self.assertEqual(frontmatter["name"], "learning-architect")
+        self.assertTrue(frontmatter["description"].startswith("Use when "))
+
+        self.assertIn("## Identity Contract", body)
+        stages = [
+            "Discovery",
+            "Goal Analysis",
+            "Gap Analysis",
+            "Competency Design",
+            "Curriculum Design",
+            "Project Design",
+            "Roadmap",
+            "Weekly Planner",
+            "Assessment",
+            "Outcome Preparation",
+            "Continuous Optimization",
+        ]
+        positions = []
+        for number, stage in enumerate(stages, start=1):
+            marker = f"{number}. **{stage}**"
+            self.assertIn(marker, body)
+            positions.append(body.index(marker))
+        self.assertEqual(positions, sorted(positions))
+
+        self.assertIn("| Observable condition | Load |", body)
+        self.assertIn("Never treat course completion as capability evidence", body)
+        self.assertIn("Do not silently skip stages", body)
+
     def test_core_references_expose_required_contracts(self):
         reference_names = [
             "persona.md",
