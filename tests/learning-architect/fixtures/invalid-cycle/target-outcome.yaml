@@ -1,6 +1,6 @@
 id: target-outcome-001
 schema_version: 1.0.0
-content_version: 1.0.0
+content_version: 1
 status: active
 source: fixture
 confidence: high

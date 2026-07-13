@@ -1,6 +1,6 @@
 id: focused-tool-ticket-intake
 schema_version: 1.0.0
-content_version: 1.0.0
+content_version: 1
 status: validated
 source: learner target outcome and ai-agent-engineer domain pack 1.0.0
 confidence: high

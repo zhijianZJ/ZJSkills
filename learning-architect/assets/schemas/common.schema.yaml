@@ -5,12 +5,15 @@ $defs:
   id:
     type: string
     minLength: 1
-  version:
+  semantic_version:
     type: string
-    minLength: 1
+    pattern: '^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$'
+  content_version:
+    type: integer
+    minimum: 1
   status:
     type: string
-    minLength: 1
+    enum: [draft, validated, active, superseded, archived]
   source:
     type: string
     minLength: 1

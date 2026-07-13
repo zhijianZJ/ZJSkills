@@ -32,17 +32,31 @@ $defs:
 required: [id, schema_version, content_version, status, source, confidence, created_at, updated_at, version, last_reviewed_at, review_interval_days, target_outcomes, competencies, dependencies, project_archetypes, assessment_patterns, outcome_preparation, market_assumptions]
 properties:
   id: {$ref: common.schema.yaml#/$defs/id}
-  schema_version: {$ref: common.schema.yaml#/$defs/version}
-  content_version: {$ref: common.schema.yaml#/$defs/version}
+  schema_version: {$ref: common.schema.yaml#/$defs/semantic_version}
+  content_version: {$ref: common.schema.yaml#/$defs/content_version}
   status: {$ref: common.schema.yaml#/$defs/status}
   source: {$ref: common.schema.yaml#/$defs/source}
   confidence: {$ref: common.schema.yaml#/$defs/confidence}
   created_at: {$ref: common.schema.yaml#/$defs/timestamp}
   updated_at: {$ref: common.schema.yaml#/$defs/timestamp}
-  version: {$ref: common.schema.yaml#/$defs/version}
+  version: {$ref: common.schema.yaml#/$defs/semantic_version}
   last_reviewed_at: {type: string, format: date}
   review_interval_days: {type: integer, minimum: 1}
-  target_outcomes: {type: array}
+  target_outcomes:
+    type: array
+    minItems: 1
+    items:
+      type: object
+      additionalProperties: false
+      required: [id, name, description, success_evidence, source, as_of]
+      properties:
+        id: {$ref: common.schema.yaml#/$defs/id}
+        name: {type: string, minLength: 1}
+        description: {type: string, minLength: 1}
+        success_evidence: {type: array, minItems: 1, items: {type: string, minLength: 1}}
+        source: {type: string, minLength: 1}
+        as_of: {type: string, format: date}
+        source_url: {type: string, format: uri, pattern: '^https?://'}
   competencies:
     type: array
     minItems: 1
@@ -128,6 +142,34 @@ properties:
             guided: {type: string, minLength: 1}
             independent: {type: string, minLength: 1}
             transfer: {type: string, minLength: 1}
-  outcome_preparation: {type: object}
-  market_assumptions: {type: array}
+  outcome_preparation:
+    type: object
+    minProperties: 1
+    additionalProperties:
+      type: object
+      additionalProperties: false
+      required: [minimum_evidence, artifacts, readiness_gate, source, as_of]
+      properties:
+        minimum_evidence: {type: array, minItems: 1, items: {type: string, minLength: 1}}
+        artifacts: {type: array, minItems: 1, items: {type: string, minLength: 1}}
+        readiness_gate: {type: string, minLength: 1}
+        source: {type: string, minLength: 1}
+        as_of: {type: string, format: date}
+        source_url: {type: string, format: uri, pattern: '^https?://'}
+  market_assumptions:
+    type: array
+    minItems: 1
+    items:
+      type: object
+      additionalProperties: false
+      required: [id, as_of, source_name, assumption, confidence, implication, next_review_at]
+      properties:
+        id: {$ref: common.schema.yaml#/$defs/id}
+        as_of: {type: string, format: date}
+        source_name: {type: string, minLength: 1}
+        source_url: {type: string, format: uri, pattern: '^https?://'}
+        assumption: {type: string, minLength: 1}
+        confidence: {$ref: common.schema.yaml#/$defs/confidence}
+        implication: {type: string, minLength: 1}
+        next_review_at: {type: string, format: date}
   extensions: {$ref: common.schema.yaml#/$defs/extensions}

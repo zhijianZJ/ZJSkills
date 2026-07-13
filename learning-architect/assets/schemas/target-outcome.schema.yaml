@@ -5,8 +5,8 @@ additionalProperties: false
 required: [id, schema_version, content_version, status, source, confidence, created_at, updated_at, outcome_type, primary_goal, deadline, success_evidence, key_results]
 properties:
   id: {$ref: common.schema.yaml#/$defs/id}
-  schema_version: {$ref: common.schema.yaml#/$defs/version}
-  content_version: {$ref: common.schema.yaml#/$defs/version}
+  schema_version: {$ref: common.schema.yaml#/$defs/semantic_version}
+  content_version: {$ref: common.schema.yaml#/$defs/content_version}
   status: {$ref: common.schema.yaml#/$defs/status}
   source: {$ref: common.schema.yaml#/$defs/source}
   confidence: {$ref: common.schema.yaml#/$defs/confidence}
@@ -14,7 +14,7 @@ properties:
   updated_at: {$ref: common.schema.yaml#/$defs/timestamp}
   outcome_type: {type: string, minLength: 1}
   primary_goal: {type: string, minLength: 1}
-  deadline: {type: string}
-  success_evidence: {type: array}
-  key_results: {type: array}
+  deadline: {type: string, format: date}
+  success_evidence: {type: array, minItems: 1, items: {type: string, minLength: 1}}
+  key_results: {type: array, minItems: 1, items: {type: string, minLength: 1}}
   extensions: {$ref: common.schema.yaml#/$defs/extensions}

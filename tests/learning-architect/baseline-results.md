@@ -1,5 +1,14 @@
 # Learning Architect Baseline Results
 
+## Evaluation provenance
+
+- `direct-course-request`: evaluator ID `eval_direct_course`
+- `completion-is-not-capability`: evaluator ID `eval_completion`
+- `impossible-constraint`: evaluator ID `eval_constraint`
+- `goal-pivot`: evaluator ID `eval_goal_pivot`
+- `theory-practice-gap`: evaluator ID `eval_theory_gap`
+- Timestamp limitation: `.superpowers/sdd/task-1-report.md` preserves these evaluator IDs and the evaluation procedure, but it does not contain evaluator run timestamps. No timestamps are reconstructed or inferred here.
+
 ## direct-course-request
 - Decision: 未满足。评估器接受用户要求，直接生成 100 门微课程和 24 周逐日安排。
 - Verbatim evidence: “下面是一套从零基础到能独立开发、评测和部署 AI Agent 的完整路线。这里的‘100 门课程’指 100 个连续微课程，不要求你另外购买 100 门网课。”随后直接列出“## 100 门课程”和“# 24 周每日安排”。

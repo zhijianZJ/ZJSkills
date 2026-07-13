@@ -1,12 +1,12 @@
 id: competency-model-001
 schema_version: 1.0.0
-content_version: 1.0.0
+content_version: 1
 status: active
 source: fixture
 confidence: high
 created_at: "2026-07-13T00:00:00Z"
 updated_at: "2026-07-13T00:00:00Z"
-domain_pack_id: backend-engineering
+domain_pack_id: ai-agent-engineer
 competencies:
   - id: python-foundation
     category: technical

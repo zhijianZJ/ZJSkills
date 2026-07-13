@@ -4,13 +4,14 @@
 from __future__ import annotations
 
 import argparse
+from datetime import date, datetime, timedelta
 from pathlib import Path
 import re
 import sys
 from typing import Any
 
 from jsonschema import Draft202012Validator, FormatChecker
-from jsonschema.exceptions import SchemaError
+from jsonschema.exceptions import FormatError, SchemaError
 from referencing import Registry, Resource
 import yaml
 
@@ -55,6 +56,52 @@ COURSE_PURCHASE_PATTERNS = (
     r"购买[^。！？.!?\n]{0,60}课程",
     r"报名[^。！？.!?\n]{0,60}课程",
 )
+CANONICAL_STAGES = (
+    "discovery",
+    "goal-analysis",
+    "gap-analysis",
+    "competency-design",
+    "curriculum-design",
+    "project-design",
+    "roadmap",
+    "weekly-planner",
+    "assessment",
+    "outcome-preparation",
+    "continuous-optimization",
+)
+SINGLETON_ARTIFACTS = {
+    "system-state.yaml": "system-state",
+    "learner-profile.yaml": "learner-profile",
+    "target-outcome.yaml": "target-outcome",
+    "competency-model.yaml": "competency-model",
+    "curriculum-graph.yaml": "curriculum-graph",
+    "roadmap.yaml": "learning-roadmap",
+    "learning-roadmap.yaml": "learning-roadmap",
+    "optimization-log.yaml": "optimization-state",
+    "assessment.yaml": "assessment",
+    "evidence.yaml": "evidence",
+    "weekly-plan.yaml": "weekly-plan",
+    "project.yaml": "project",
+}
+DIRECTORY_ARTIFACTS = {
+    "weekly-plans": "weekly-plan",
+    "projects": "project",
+    "assessments": "assessment",
+    "portfolio": "evidence",
+    "evidence": "evidence",
+}
+LEARNER_FORMAT_CHECKER = FormatChecker()
+
+
+@LEARNER_FORMAT_CHECKER.checks("date-time")
+def _is_iso_datetime(value: object) -> bool:
+    if not isinstance(value, str):
+        return True
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return False
+    return parsed.tzinfo is not None
 
 
 def _load_yaml(path: Path) -> Any:
@@ -71,6 +118,32 @@ def _iter_strings(value: Any):
     elif isinstance(value, list):
         for item in value:
             yield from _iter_strings(item)
+
+
+def _iter_string_paths(value: Any, path: tuple[str, ...] = ()):
+    if isinstance(value, str):
+        yield path, value
+    elif isinstance(value, dict):
+        for key, item in value.items():
+            yield from _iter_string_paths(item, path + (str(key),))
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            yield from _iter_string_paths(item, path + (str(index),))
+
+
+def _artifact_schema_name(learner_dir: Path, path: Path) -> str | None:
+    relative = path.relative_to(learner_dir)
+    parts = list(relative.parts)
+    while parts and parts[0] in {"history", "versions", "version-history"}:
+        parts.pop(0)
+    if not parts:
+        return None
+    if len(parts) == 1:
+        return SINGLETON_ARTIFACTS.get(parts[0])
+    for part in parts[:-1]:
+        if part in DIRECTORY_ARTIFACTS:
+            return DIRECTORY_ARTIFACTS[part]
+    return SINGLETON_ARTIFACTS.get(parts[-1])
 
 
 def _load_schemas(skill_root: Path) -> tuple[dict[str, dict[str, Any]], Registry]:
@@ -167,7 +240,10 @@ def _validate_domain_pack_semantics(
         errors.append(f"Domain Pack dependency cycle detected: {pack_name}")
 
     archetypes = pack["project_archetypes"]
-    archetype_ids = {archetype["id"] for archetype in archetypes}
+    archetype_id_list = [archetype["id"] for archetype in archetypes]
+    archetype_ids = set(archetype_id_list)
+    if len(archetype_id_list) != len(archetype_ids):
+        errors.append(f"Domain Pack {pack_name}: duplicate project archetype IDs")
     if archetype_ids != REQUIRED_PROJECT_ARCHETYPES:
         errors.append(
             f"Domain Pack {pack_name}: project archetypes must be exactly "
@@ -192,6 +268,9 @@ def _validate_domain_pack_semantics(
                 f"weights must total 100"
             )
 
+    pattern_ids = [pattern["id"] for pattern in pack["assessment_patterns"]]
+    if len(pattern_ids) != len(set(pattern_ids)):
+        errors.append(f"Domain Pack {pack_name}: duplicate assessment pattern IDs")
     assessment_checks = {
         check
         for pattern in pack["assessment_patterns"]
@@ -202,11 +281,17 @@ def _validate_domain_pack_semantics(
             f"Domain Pack {pack_name}: assessment capability coverage mismatch"
         )
 
-    pack_strings = list(_iter_strings(pack))
-    if any(re.search(r"https?://", value, flags=re.IGNORECASE) for value in pack_strings):
+    forbidden_urls = [
+        value
+        for path, value in _iter_string_paths(pack)
+        if path[-1:] != ("source_url",)
+        and re.search(r"https?://", value, flags=re.IGNORECASE)
+    ]
+    if forbidden_urls:
         errors.append(
-            f"Domain Pack {pack_name}: HTTP/HTTPS URL is forbidden"
+            f"Domain Pack {pack_name}: HTTP/HTTPS URL is allowed only in source_url"
         )
+    pack_strings = list(_iter_strings(pack))
     if any(
         re.search(pattern, value, flags=re.IGNORECASE)
         for value in pack_strings
@@ -217,16 +302,46 @@ def _validate_domain_pack_semantics(
             "recommendation is forbidden"
         )
 
-    if pack.get("id") == "ai-agent-engineer":
-        expected_metadata = {
-            "version": "1.0.0",
-            "last_reviewed_at": "2026-07-13",
-            "review_interval_days": 90,
-        }
-        for field, expected in expected_metadata.items():
-            if pack.get(field) != expected:
+    try:
+        reviewed = date.fromisoformat(pack["last_reviewed_at"])
+        interval = int(pack["review_interval_days"])
+        if date.today() > reviewed + timedelta(days=interval):
+            errors.append(
+                f"Domain Pack {pack_name}: stale review; last_reviewed_at plus "
+                "review_interval_days is in the past"
+            )
+    except (KeyError, TypeError, ValueError):
+        errors.append(f"Domain Pack {pack_name}: invalid review governance")
+
+    for assumption in pack.get("market_assumptions", []):
+        assumption_id = assumption.get("id", "<unknown>")
+        if not assumption.get("source_name") or not assumption.get("as_of"):
+            errors.append(
+                f"Domain Pack {pack_name}: market assumption {assumption_id} "
+                "requires source and date"
+            )
+            continue
+        try:
+            date.fromisoformat(assumption["as_of"])
+        except (TypeError, ValueError):
+            errors.append(
+                f"Domain Pack {pack_name}: market assumption {assumption_id} "
+                "has invalid as_of date"
+            )
+
+    migration_map = pack.get("extensions", {}).get("migration_map", {})
+    if not isinstance(migration_map, dict):
+        errors.append(f"Domain Pack {pack_name}: migration_map must be an object")
+    else:
+        for old_id, new_ids in migration_map.items():
+            targets = new_ids if isinstance(new_ids, list) else [new_ids]
+            if not old_id or not targets or any(
+                not isinstance(target, str) or target not in competency_id_set
+                for target in targets
+            ):
                 errors.append(
-                    f"Domain Pack {pack_name}: {field} must be {expected!r}"
+                    f"Domain Pack {pack_name}: migration for {old_id!r} "
+                    "must target installed competency IDs"
                 )
     return errors
 
@@ -263,34 +378,92 @@ def validate_learner_system(skill_root: Path, learner_dir: Path) -> list[str]:
     except (OSError, yaml.YAMLError) as exc:
         return [f"Unable to load schemas: {exc}"]
 
-    documents: dict[str, dict[str, Any]] = {}
-    for path in sorted(learner_dir.glob("*.yaml")):
-        name = path.stem
-        if name not in schemas or name == "common":
+    artifacts: dict[str, list[tuple[Path, dict[str, Any]]]] = {}
+    artifact_by_key: dict[str, tuple[str, Path, dict[str, Any]]] = {}
+    seen_document_ids: dict[str, Path] = {}
+    for path in sorted(learner_dir.rglob("*.yaml")):
+        name = _artifact_schema_name(learner_dir, path)
+        if name is None or name == "common":
+            errors.append(f"Unknown learner artifact path: {path.relative_to(learner_dir)}")
             continue
         try:
             document = _load_yaml(path)
         except (OSError, yaml.YAMLError) as exc:
-            errors.append(f"Invalid learner YAML {path}: {exc}")
+            errors.append(f"Invalid learner YAML {path.relative_to(learner_dir)}: {exc}")
             continue
         if not isinstance(document, dict):
             errors.append(f"Learner document is not an object: {path}")
             continue
-        validator = Draft202012Validator(schemas[name], registry=registry)
+        validator = Draft202012Validator(
+            schemas[name], registry=registry, format_checker=LEARNER_FORMAT_CHECKER
+        )
         issues = sorted(
             validator.iter_errors(document), key=lambda item: list(item.path)
         )
+        checker = LEARNER_FORMAT_CHECKER
+        format_invalid = False
+        for timestamp_field in ("created_at", "updated_at"):
+            if timestamp_field in document:
+                try:
+                    checker.check(document[timestamp_field], "date-time")
+                except FormatError as exc:
+                    errors.append(
+                        f"{path.relative_to(learner_dir)}:{timestamp_field}: {exc}"
+                    )
+                    format_invalid = True
+        for date_field in ("deadline",):
+            if date_field in document:
+                try:
+                    checker.check(document[date_field], "date")
+                except FormatError as exc:
+                    errors.append(
+                        f"{path.relative_to(learner_dir)}:{date_field}: {exc}"
+                    )
+                    format_invalid = True
         for issue in issues:
             location = ".".join(str(part) for part in issue.path) or "<root>"
-            errors.append(f"{path.name}:{location}: {issue.message}")
-        if not issues:
-            documents[name] = document
+            errors.append(
+                f"{path.relative_to(learner_dir)}:{location}: {issue.message}"
+            )
+        if not issues and not format_invalid:
+            artifacts.setdefault(name, []).append((path, document))
+            relative_key = path.relative_to(learner_dir).with_suffix("").as_posix()
+            artifact_by_key[relative_key] = (name, path, document)
+            if path.parent == learner_dir:
+                artifact_by_key[path.stem] = (name, path, document)
+            document_id = document["id"]
+            previous = seen_document_ids.get(document_id)
+            if previous is not None:
+                errors.append(
+                    f"Duplicate global artifact ID {document_id}: "
+                    f"{previous.relative_to(learner_dir)} and {path.relative_to(learner_dir)}"
+                )
+            else:
+                seen_document_ids[document_id] = path
 
-    curriculum = documents.get("curriculum-graph")
+    def first(name: str) -> dict[str, Any] | None:
+        records = artifacts.get(name, [])
+        return records[0][1] if records else None
+
+    curriculum = first("curriculum-graph")
     if curriculum and _has_dependency_cycle(curriculum.get("dependencies", [])):
         errors.append("Curriculum dependency cycle detected")
+    if curriculum:
+        unit_ids = [unit["id"] for unit in curriculum.get("units", [])]
+        if len(unit_ids) != len(set(unit_ids)):
+            errors.append("Duplicate curriculum unit IDs")
+        unknown = sorted(
+            {
+                endpoint
+                for edge in curriculum.get("dependencies", [])
+                for endpoint in (edge["from"], edge["to"])
+                if endpoint not in set(unit_ids)
+            }
+        )
+        if unknown:
+            errors.append(f"Unknown curriculum dependency endpoints: {', '.join(unknown)}")
 
-    roadmap = documents.get("learning-roadmap")
+    roadmap = first("learning-roadmap")
     if roadmap:
         phases = roadmap.get("phases", [])
         phase_cost_sum = sum(phase.get("estimated_cost", 0) for phase in phases)
@@ -314,21 +487,117 @@ def validate_learner_system(skill_root: Path, learner_dir: Path) -> list[str]:
                 + ", ".join(mismatched_phases)
             )
 
-    competency_model = documents.get("competency-model")
-    evidence = documents.get("evidence")
-    if competency_model and evidence:
-        competency_ids = {
-            competency["id"] for competency in competency_model.get("competencies", [])
-        }
+    competency_model = first("competency-model")
+    competency_id_list = [
+        competency["id"]
+        for competency in (competency_model or {}).get("competencies", [])
+    ]
+    competency_ids = set(competency_id_list)
+    if len(competency_id_list) != len(competency_ids):
+        errors.append("Duplicate competency IDs in competency model")
+    installed_domain_pack_ids = {
+        pack.get("id")
+        for path in (skill_root / "assets" / "domain-packs").glob("*.yaml")
+        if isinstance((pack := _load_yaml(path)), dict)
+    }
+    if competency_model and competency_model.get("domain_pack_id") not in installed_domain_pack_ids:
+        errors.append(
+            "Competency model references uninstalled Domain Pack: "
+            f"{competency_model.get('domain_pack_id')}"
+        )
+
+    evidence_records: dict[str, dict[str, Any]] = {}
+    for _, evidence in artifacts.get("evidence", []):
+        evidence_records[evidence["id"]] = evidence
         for competency_id in evidence.get("competency_ids", []):
             if competency_id not in competency_ids:
                 errors.append(
                     f"Evidence references unknown competency: {competency_id}"
                 )
 
-    assessment = documents.get("assessment")
-    if assessment:
-        evidence_records = {evidence["id"]: evidence} if evidence else {}
+    learner_profile = first("learner-profile")
+    if learner_profile:
+        material_sections = [
+            learner_profile.get(name, {})
+            for name in (
+                "personal", "experience", "learning_preferences", "motivation", "constraints"
+            )
+        ]
+        material_items = [
+            item for section in material_sections for item in section.values()
+        ]
+        material_items.extend(
+            item
+            for items in learner_profile.get("swot", {}).values()
+            for item in items
+        )
+        material_items.extend(learner_profile.get("unknowns", []))
+        for item in material_items:
+            for evidence_id in item.get("evidence_ids", []):
+                if evidence_id not in evidence_records:
+                    errors.append(
+                        f"Learner profile references unknown Evidence record: {evidence_id}"
+                    )
+
+    for project_path, project in artifacts.get("project", []):
+        for competency_id in project.get("competency_ids", []):
+            if competency_id not in competency_ids:
+                errors.append(
+                    f"Project references unknown competency: {competency_id} "
+                    f"({project_path.relative_to(learner_dir)})"
+                )
+
+    project_ids = {
+        project["id"] for _, project in artifacts.get("project", [])
+    }
+    if roadmap:
+        for phase in roadmap.get("phases", []):
+            for project_id in phase.get("project_ids", []):
+                if project_id not in project_ids:
+                    errors.append(f"Roadmap references unknown project: {project_id}")
+
+    for weekly_path, weekly in artifacts.get("weekly-plan", []):
+        task_ids = {task["id"] for task in weekly.get("tasks", [])}
+        for task in weekly.get("tasks", []):
+            dependency = task.get("dependency")
+            if dependency not in {None, "none"} and dependency not in task_ids:
+                errors.append(
+                    f"Weekly task references unknown task: {dependency} "
+                    f"({weekly_path.relative_to(learner_dir)})"
+                )
+            for competency_id in task.get("competency_ids", []):
+                if competency_id not in competency_ids:
+                    errors.append(f"Weekly task references unknown competency: {competency_id}")
+        for retrieval in weekly.get("retrieval_practice", []):
+            competency_id = retrieval.get("competency_id")
+            if competency_id not in competency_ids:
+                errors.append(
+                    f"Weekly retrieval references unknown competency: {competency_id}"
+                )
+        project_id = weekly.get("project_work", {}).get("project_id")
+        if project_id and project_id not in project_ids:
+            errors.append(f"Weekly plan references unknown project: {project_id}")
+        planned_hours = (
+            sum(item.get("estimated_hours", 0) for item in weekly.get("tasks", []))
+            + sum(item.get("estimated_hours", 0) for item in weekly.get("retrieval_practice", []))
+            + weekly.get("project_work", {}).get("estimated_hours", 0)
+            + weekly.get("review", {}).get("estimated_hours", 0)
+        )
+        buffer_ratio = weekly.get("extensions", {}).get("buffer_ratio", 0)
+        usable_capacity = weekly.get("capacity_hours", 0) * (1 - buffer_ratio)
+        if planned_hours > usable_capacity + 1e-9:
+            errors.append(
+                f"Weekly planned load {planned_hours:g} exceeds usable capacity "
+                f"{usable_capacity:g}: {weekly_path.relative_to(learner_dir)}"
+            )
+        declared_planned = weekly.get("extensions", {}).get("planned_load_hours")
+        declared_usable = weekly.get("extensions", {}).get("usable_capacity_hours")
+        if declared_planned is not None and abs(declared_planned - planned_hours) > 1e-9:
+            errors.append("Weekly planned_load_hours does not equal typed task arithmetic")
+        if declared_usable is not None and abs(declared_usable - usable_capacity) > 1e-9:
+            errors.append("Weekly usable_capacity_hours does not equal capacity arithmetic")
+
+    for _, assessment in artifacts.get("assessment", []):
         for evidence_id in assessment.get("evidence_ids", []):
             if evidence_id not in evidence_records:
                 errors.append(
@@ -361,14 +630,75 @@ def validate_learner_system(skill_root: Path, learner_dir: Path) -> list[str]:
                     "Assessment evidence does not contain matching observed "
                     f"behavior state: {behavior}={expected_state}"
                 )
-
-    system_state = documents.get("system-state")
-    if system_state:
-        for artifact_name in system_state.get("active_versions", {}):
-            if not (learner_dir / f"{artifact_name}.yaml").is_file():
+            if expected_state == "fail" and not resolved_records:
                 errors.append(
-                    f"Active version references missing learner file: {artifact_name}.yaml"
+                    f"Assessment behavior {behavior} requires resolved failure evidence"
                 )
+        for result in assessment.get("competency_results", []):
+            if result.get("competency_id") not in competency_ids:
+                errors.append(
+                    "Assessment references unknown competency: "
+                    f"{result.get('competency_id')}"
+                )
+        applicable_problems = {
+            check["behavior"]
+            for check in assessment.get("behavior_checks", [])
+            if check.get("applicability") == "applicable"
+            and (check.get("state") == "fail" or not check.get("evidence_ids"))
+        }
+        gate_missing = set(assessment.get("gate", {}).get("missing", []))
+        if not assessment.get("gate", {}).get("passed") and gate_missing != applicable_problems:
+            errors.append(
+                "Assessment gate.missing must exactly match failed or missing "
+                "applicable behaviors"
+            )
+
+    system_state = first("system-state")
+    if system_state:
+        stage_states = system_state.get("stage_states", {})
+        current_stage = system_state.get("current_stage")
+        current_index = CANONICAL_STAGES.index(current_stage)
+        completed_states = {"validated", "not_applicable", "superseded", "archived"}
+        illegal = []
+        for index, stage in enumerate(CANONICAL_STAGES):
+            stage_state = stage_states.get(stage, {}).get("state")
+            if index < current_index and stage_state not in completed_states:
+                illegal.append(f"{stage}={stage_state}")
+            if index > current_index and stage_state not in {"not_started"}:
+                illegal.append(f"{stage}={stage_state}")
+        current_value = stage_states.get(current_stage, {}).get("state")
+        if current_value not in {"collecting", "draft", "validated", "active", "needs_input", "blocked"}:
+            illegal.append(f"current {current_stage}={current_value}")
+        if illegal:
+            errors.append("Illegal stage progression: " + ", ".join(illegal))
+
+        for artifact_name, active_version in system_state.get("active_versions", {}).items():
+            resolved = artifact_by_key.get(artifact_name)
+            if resolved is None:
+                errors.append(
+                    f"Active version references missing learner artifact: {artifact_name}"
+                )
+                continue
+            schema_name, _, artifact = resolved
+            expected_schema = SINGLETON_ARTIFACTS.get(f"{artifact_name}.yaml")
+            if expected_schema and schema_name != expected_schema:
+                errors.append(f"Active version has wrong artifact type: {artifact_name}")
+            if artifact.get("content_version") != active_version:
+                errors.append(
+                    f"Active version mismatch for {artifact_name}: state={active_version!r}, "
+                    f"artifact={artifact.get('content_version')!r}"
+                )
+            if artifact.get("status") != "active":
+                errors.append(f"Active version points to non-active artifact: {artifact_name}")
+            artifact_id = str(artifact.get("id", ""))
+            expected_id = Path(artifact_name).name
+            id_matches = (
+                artifact_id == expected_id
+                if "/" in artifact_name
+                else artifact_id.startswith(artifact_name)
+            )
+            if not id_matches:
+                errors.append(f"Active version has wrong artifact ID/type: {artifact_name}")
 
     return errors
 
