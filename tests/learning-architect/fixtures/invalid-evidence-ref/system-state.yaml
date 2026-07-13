@@ -1,0 +1,13 @@
+id: system-state-learner-001
+schema_version: 1.0.0
+content_version: 1.0.0
+status: active
+source: fixture
+confidence: 1.0
+created_at: "2026-07-13T00:00:00Z"
+updated_at: "2026-07-13T00:00:00Z"
+learner_id: learner-001
+current_stage: foundation
+stage_states: {foundation: active}
+active_versions: {learner-profile: 1.0.0, target-outcome: 1.0.0, competency-model: 1.0.0, curriculum-graph: 1.0.0, evidence: 1.0.0}
+next_action: Complete API integration practice

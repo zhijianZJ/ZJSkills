@@ -1,0 +1,25 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: Domain Pack
+type: object
+additionalProperties: false
+required: [id, schema_version, content_version, status, source, confidence, created_at, updated_at, version, last_reviewed_at, review_interval_days, target_outcomes, competencies, dependencies, project_archetypes, assessment_patterns, outcome_preparation, market_assumptions]
+properties:
+  id: {$ref: common.schema.yaml#/$defs/id}
+  schema_version: {$ref: common.schema.yaml#/$defs/version}
+  content_version: {$ref: common.schema.yaml#/$defs/version}
+  status: {$ref: common.schema.yaml#/$defs/status}
+  source: {$ref: common.schema.yaml#/$defs/source}
+  confidence: {$ref: common.schema.yaml#/$defs/confidence}
+  created_at: {$ref: common.schema.yaml#/$defs/timestamp}
+  updated_at: {$ref: common.schema.yaml#/$defs/timestamp}
+  version: {$ref: common.schema.yaml#/$defs/version}
+  last_reviewed_at: {$ref: common.schema.yaml#/$defs/timestamp}
+  review_interval_days: {type: integer, minimum: 1}
+  target_outcomes: {type: array}
+  competencies: {type: array}
+  dependencies: {type: array}
+  project_archetypes: {type: array}
+  assessment_patterns: {type: array}
+  outcome_preparation: {type: object}
+  market_assumptions: {type: array}
+  extensions: {$ref: common.schema.yaml#/$defs/extensions}

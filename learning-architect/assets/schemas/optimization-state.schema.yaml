@@ -1,0 +1,21 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: Optimization State
+type: object
+additionalProperties: false
+required: [id, schema_version, content_version, status, source, confidence, created_at, updated_at, trigger, diagnosis, changes, affected_artifacts, expected_effect, review_at]
+properties:
+  id: {$ref: common.schema.yaml#/$defs/id}
+  schema_version: {$ref: common.schema.yaml#/$defs/version}
+  content_version: {$ref: common.schema.yaml#/$defs/version}
+  status: {$ref: common.schema.yaml#/$defs/status}
+  source: {$ref: common.schema.yaml#/$defs/source}
+  confidence: {$ref: common.schema.yaml#/$defs/confidence}
+  created_at: {$ref: common.schema.yaml#/$defs/timestamp}
+  updated_at: {$ref: common.schema.yaml#/$defs/timestamp}
+  trigger: {type: string}
+  diagnosis: {type: string}
+  changes: {type: array}
+  affected_artifacts: {type: array}
+  expected_effect: {type: string}
+  review_at: {$ref: common.schema.yaml#/$defs/timestamp}
+  extensions: {$ref: common.schema.yaml#/$defs/extensions}

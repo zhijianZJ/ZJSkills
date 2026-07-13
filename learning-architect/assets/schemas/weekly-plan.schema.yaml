@@ -1,0 +1,21 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: Weekly Plan
+type: object
+additionalProperties: false
+required: [id, schema_version, content_version, status, source, confidence, created_at, updated_at, week_id, weekly_outcome, capacity_hours, tasks, retrieval_practice, minimum_delivery]
+properties:
+  id: {$ref: common.schema.yaml#/$defs/id}
+  schema_version: {$ref: common.schema.yaml#/$defs/version}
+  content_version: {$ref: common.schema.yaml#/$defs/version}
+  status: {$ref: common.schema.yaml#/$defs/status}
+  source: {$ref: common.schema.yaml#/$defs/source}
+  confidence: {$ref: common.schema.yaml#/$defs/confidence}
+  created_at: {$ref: common.schema.yaml#/$defs/timestamp}
+  updated_at: {$ref: common.schema.yaml#/$defs/timestamp}
+  week_id: {type: string, minLength: 1}
+  weekly_outcome: {type: string}
+  capacity_hours: {type: number, minimum: 0}
+  tasks: {type: array}
+  retrieval_practice: {type: array}
+  minimum_delivery: {type: string}
+  extensions: {$ref: common.schema.yaml#/$defs/extensions}
