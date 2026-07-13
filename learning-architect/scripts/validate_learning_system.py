@@ -339,6 +339,7 @@ def validate_learner_system(skill_root: Path, learner_dir: Path) -> list[str]:
             if check.get("applicability") != "applicable":
                 continue
             behavior = check.get("behavior", "<unknown>")
+            expected_state = check.get("state", "<unknown>")
             resolved_records = []
             for evidence_id in check.get("evidence_ids", []):
                 record = evidence_records.get(evidence_id)
@@ -349,16 +350,16 @@ def validate_learner_system(skill_root: Path, learner_dir: Path) -> list[str]:
                     )
                 else:
                     resolved_records.append(record)
-            has_passing_observation = any(
+            has_matching_observation = any(
                 observation.get("behavior") == behavior
-                and observation.get("state") == "pass"
+                and observation.get("state") == expected_state
                 for record in resolved_records
                 for observation in record.get("observed_behaviors", [])
             )
-            if resolved_records and not has_passing_observation:
+            if resolved_records and not has_matching_observation:
                 errors.append(
-                    "Assessment evidence does not contain passing observed "
-                    f"behavior: {behavior}"
+                    "Assessment evidence does not contain matching observed "
+                    f"behavior state: {behavior}={expected_state}"
                 )
 
     system_state = documents.get("system-state")

@@ -383,11 +383,65 @@ class LearningSystemValidationTests(unittest.TestCase):
                 )
                 self.assertTrue(
                     any(
-                        "passing observed behavior: explain" in error
+                        "matching observed behavior state: explain=pass" in error
                         for error in errors
                     ),
                     errors,
                 )
+
+    def test_assessment_semantics_match_resolved_failure_state(self):
+        for evidence_state, should_pass in [("fail", True), ("pass", False)]:
+            with self.subTest(evidence_state=evidence_state), tempfile.TemporaryDirectory() as temporary_directory:
+                learner_dir = Path(temporary_directory) / "learner"
+                shutil.copytree(self.fixtures / "valid-learner", learner_dir)
+
+                assessment_path = learner_dir / "assessment.yaml"
+                assessment = yaml.safe_load(
+                    assessment_path.read_text(encoding="utf-8")
+                )
+                independent_check = next(
+                    item
+                    for item in assessment["behavior_checks"]
+                    if item["behavior"] == "independent"
+                )
+                independent_check["state"] = "fail"
+                assessment["decision"] = "fail"
+                assessment["gate"] = {
+                    "passed": False,
+                    "missing": ["independent"],
+                }
+                assessment_path.write_text(
+                    yaml.safe_dump(assessment), encoding="utf-8"
+                )
+
+                evidence_path = learner_dir / "evidence.yaml"
+                evidence = yaml.safe_load(
+                    evidence_path.read_text(encoding="utf-8")
+                )
+                independent_observation = next(
+                    item
+                    for item in evidence["observed_behaviors"]
+                    if item["behavior"] == "independent"
+                )
+                independent_observation["state"] = evidence_state
+                evidence_path.write_text(
+                    yaml.safe_dump(evidence), encoding="utf-8"
+                )
+
+                errors = self.validator.validate_learner_system(
+                    self.skill_root, learner_dir
+                )
+                if should_pass:
+                    self.assertEqual(errors, [])
+                else:
+                    self.assertTrue(
+                        any(
+                            "matching observed behavior state: independent=fail"
+                            in error
+                            for error in errors
+                        ),
+                        errors,
+                    )
 
     def test_passing_assessment_rejects_all_six_not_applicable(self):
         document = self.make_assessment_document()
