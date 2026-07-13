@@ -2,9 +2,30 @@
 
 ## Method
 
-Each scenario was run in a fresh evaluator context. The evaluator received the learner prompt, `learning-architect/SKILL.md`, and only the references selected by the Skill's observable routing conditions. Evaluators were not shown `scenarios.yaml`, the required behaviors, `baseline-results.md`, the Task 7 brief, repository history, or another evaluator's output. The response blocks below are preserved verbatim.
+Each scenario was run in a fresh evaluator context. The evaluator received the learner prompt, `learning-architect/SKILL.md`, and only the references recorded for that attempt. The response blocks below are preserved verbatim. Orchestration evaluator IDs are the canonical child task names from Codex session metadata; they are distinct from any model-generated `engine_result.run_id` inside an answer.
 
-The five first runs produced 13/15 behavior passes. The two failures were converted into the smallest directly responsible output-contract changes, then only those scenarios were rerun in new contexts. Final result: 15/15 required behaviors pass.
+The five first runs produced 13/15 behavior passes. The first fixes closed those observations, but review later found that the first goal-pivot retest used `candidate_version: pending`, which is not an auditable version identifier, and that two routing sets were incomplete. That retest is retained and reclassified below. Two new corrected-routing attempts provide the final evidence. Final score from the latest valid attempt for each scenario: 15/15 required behaviors pass.
+
+### No-leakage prompt profiles
+
+- **NL-1 (initial attempts):** included only the scenario prompt, `SKILL.md`, and the references listed in that attempt's section. Evaluator instructions prohibited tests, baseline results, the Task 7 brief, unlisted references, and repository files. First retests additionally prohibited repository history and prior evaluator outputs. Required behaviors and expected answers were not supplied.
+- **NL-2 (review-correction attempts):** included only the scenario prompt, `SKILL.md`, and the corrected reference list recorded below. Evaluator instructions explicitly prohibited tests, scenarios, baseline results, task briefs, unlisted references, repository history, prior evaluator outputs, and grading criteria. Required behaviors and expected answers were not supplied.
+
+### Evaluator attempt registry
+
+Timestamps are actual subagent session-start timestamps recovered from local Codex `session_meta.payload.timestamp` records. They are recorded in UTC (`Z`).
+
+| Scenario / attempt | Orchestration evaluator ID | Attempt timestamp | Model-generated `run_id` | No-leakage profile |
+|---|---|---|---|---|
+| direct-course-request / first | `/root/task7_posteval/eval_direct_course` | `2026-07-13T16:12:55.831Z` | `discovery-ai-agent-20260714-01` | NL-1 |
+| completion-is-not-capability / first | `/root/task7_posteval/eval_completion_capability` | `2026-07-13T16:13:15.524Z` | `discovery-agent-career-001` | NL-1 |
+| impossible-constraint / first | `/root/task7_posteval/eval_impossible_constraint` | `2026-07-13T16:14:13.457Z` | `goal-analysis-20260714-01` | NL-1 |
+| goal-pivot / first | `/root/task7_posteval/eval_goal_pivot` | `2026-07-13T16:14:33.149Z` | `goal-pivot-ai-consulting-20260714` | NL-1 |
+| theory-practice-gap / first | `/root/task7_posteval/eval_theory_practice_gap` | `2026-07-13T16:15:56.145Z` | `assessment-20260714-theory-practice-gap-01` | NL-1 |
+| direct-course-request / first retest | `/root/task7_posteval/retest_direct_course` | `2026-07-13T16:18:00.118Z` | `discovery-ai-agent-20260714-01` | NL-1 |
+| goal-pivot / first retest | `/root/task7_posteval/retest_goal_pivot` | `2026-07-13T16:18:27.913Z` | `goal-pivot-ai-consulting-20260714` | NL-1 |
+| goal-pivot / review-correction retest | `/root/task7_posteval/review_retest_goal_pivot` | `2026-07-13T16:32:28.002Z` | `goal-pivot-ai-consulting-20260714` | NL-2 |
+| theory-practice-gap / review-correction retest | `/root/task7_posteval/review_retest_theory_gap` | `2026-07-13T16:32:45.370Z` | `assessment-theory-transfer-001` | NL-2 |
 
 ## direct-course-request
 
@@ -426,7 +447,7 @@ engine_result:
 
 - **PASS** — 从 Goal Analysis 重新计算。证据：答复“回到目标分析后重算”，且 `engine: goal-analysis`。
 - **PASS** — 重构能力、项目和结果准备，而不是追加课程。证据：“这不是‘补两节课’”，新目标链重建 Outcome Evidence、Competency Targets、Project Evidence、Curriculum Dependencies 和 Weekly Actions。
-- **PASS** — 保留版本和变更原因。证据：“旧计划应保留并标记为被替代”，并输出 `change_record`：`prior_version: unknown`、`candidate_version: pending`、`trigger: goal_change`、`reason: 目标评价场景由就业转为创业`以及完整 `affected_downstream`。
+- **FAIL (review reclassification)** — 保留版本和变更原因。观察：答复保留旧计划并输出变更原因，但 `candidate_version: pending` 是占位状态，不是实际版本标识符或精确的 `unknown`。因此该轮不足以关闭版本丢失失败。
 
 #### Verbatim final output
 
@@ -497,6 +518,95 @@ engine_result:
       - 旧目标或旧计划的版本标识
       - 每周可投入时间及关键约束
   next_action: 明确目标客户及其具体付费问题。
+```
+````
+
+### Review-correction retest
+
+#### Loaded inputs
+
+- `learning-architect/SKILL.md`
+- `learning-architect/references/persona.md`
+- `learning-architect/references/philosophy.md`
+- `learning-architect/references/workflow.md`
+- `learning-architect/references/discovery.md`
+- `learning-architect/references/goal-analysis.md`
+
+#### Behavior scores
+
+- **PASS** — 从 Goal Analysis 重新计算。证据：“旧计划应保留并标记为已被替代，重新进行目标分析”，`engine: goal-analysis`。
+- **PASS** — 重构能力、项目和结果准备，而不是追加课程。证据：答复拒绝“补两节课”，重建客户验证、能力、项目、课程依赖和每周行动。
+- **PASS** — 保留版本和变更原因。证据：`change_record` 含 `prior_version: unknown`、确定性 `candidate_version: target-outcome-v2-draft`、`trigger: goal_change`、变更原因和完整 `affected_downstream`；`artifacts_written: []` 如实表明未持久化。
+
+#### Verbatim review-correction output
+
+````text
+这不是“补两节课”，而是从“就业”切换到“AI 咨询创业”的目标变更。旧计划应保留并标记为已被替代，重新进行目标分析；否则课程、项目、能力证据和每周安排仍会服务于旧目标。
+
+暂定目标链：
+
+`Target Outcome -> Outcome Evidence -> Milestones -> Competency Targets -> Project Evidence -> Curriculum Dependencies -> Weekly Actions`
+
+`一个月内启动 AI 咨询业务 -> 可核验的创业成果待确认 -> 定位、需求验证、方案交付、复盘 -> 获客诊断、咨询方案设计、客户沟通、交付 -> 真实客户访谈与试点项目 -> 仅补齐能力缺口 -> 按可用时间重排`
+
+现在最关键的问题是：**一个月后，你希望用哪项成果证明“创业已启动”——获得首个付费客户、完成一个真实试点，还是形成服务方案并完成若干客户访谈？**
+
+```yaml
+engine_result:
+  engine: goal-analysis
+  run_id: goal-pivot-ai-consulting-20260714
+  status: needs_input
+  summary: 就业路线已变更为一个月内启动 AI 咨询创业，不能在旧计划末尾简单追加两节课。
+  inputs_used:
+    - value: 原路线为就业
+      source: user
+      confidence: high
+    - value: 新路线为一个月内开展 AI 咨询创业
+      source: user
+      confidence: high
+  decisions:
+    - decision: 返回 Goal Analysis，保留旧计划历史并重建受影响的下游设计
+      source: goal_change
+      confidence: high
+    - change_record:
+        prior_version: unknown
+        candidate_version: target-outcome-v2-draft
+        trigger: goal_change
+        reason: 目标路线由就业变更为 AI 咨询创业
+        affected_downstream:
+          - gap-analysis
+          - competency-design
+          - curriculum-design
+          - project-design
+          - roadmap
+          - weekly-planner
+          - assessment
+          - outcome-preparation
+  evidence_refs: []
+  assumptions:
+    - value: “一个月”暂按从当前决策日起连续一个月理解
+      source: inference
+      confidence: medium
+    - value: AI 咨询的细分客户、服务范围和成功证据尚未确定
+      source: inference
+      confidence: high
+  confidence: medium
+  artifacts_written: []
+  affected_downstream:
+    - gap-analysis
+    - competency-design
+    - curriculum-design
+    - project-design
+    - roadmap
+    - weekly-planner
+    - assessment
+    - outcome-preparation
+  gate:
+    passed: false
+    missing:
+      - 一个月后的可核验成功标准
+      - 旧目标的实际版本标识
+  next_action: 选择一个月后用于证明 AI 咨询创业已启动的核心成果。
 ```
 ````
 
@@ -581,6 +691,76 @@ engine_result:
 ```
 ````
 
+### Review-correction retest
+
+#### Loaded inputs
+
+- `learning-architect/SKILL.md`
+- `learning-architect/references/persona.md`
+- `learning-architect/references/philosophy.md`
+- `learning-architect/references/workflow.md`
+- `learning-architect/references/discovery.md`
+- `learning-architect/references/gap-analysis.md`
+- `learning-architect/references/competency-engine.md`
+- `learning-architect/references/project-engine.md`
+- `learning-architect/references/assessment-engine.md`
+- `learning-architect/references/optimization-engine.md`
+- `learning-architect/references/meta-learning-engine.md`
+
+#### Behavior scores
+
+- **PASS** — 回退到对应能力和项目训练。证据：`rollback_target: gap-analysis`，并计划“示例演示 → 淡化提示 → 变式练习 → 独立重测”。
+- **PASS** — 减少新理论并增加变式实践、调试和复盘。证据：“暂不安排更高级理论”，并明确“指导逐步撤除、变式练习、调试复盘和独立重测”。
+- **PASS** — 不把失败归因为学习者懒惰。证据：答复保留前置能力、练习方式、项目难度和时间安排等系统性候选原因，不作人格归因。
+
+#### Verbatim review-correction output
+
+````text
+暂不安排更高级理论。95 分测验只支持“理解较好”的判断，不能证明能独立交付；连续三次项目未能独立完成则提示更可能存在从“会解释”到“能独立完成、修改和调试”的迁移缺口。但目前只有你的自述，尚不能确定最早原因是前置能力、练习方式、项目难度还是时间安排。下一步请提供最近一次失败项目的任务说明、提交物，以及你卡住的位置或反馈记录；我会据此定位最早因果缺口，再安排“示例演示 → 淡化提示 → 变式练习 → 独立重测”，而不是直接增加理论难度。
+
+```yaml
+engine_result:
+  engine: assessment
+  run_id: assessment-theory-transfer-001
+  status: needs_input
+  summary: "高分测验与连续三次无法独立完成项目形成证据冲突；暂缓理论升级，先验证独立迁移与调试行为并定位最早因果缺口。"
+  inputs_used:
+    - value: "测验均为95分"
+      source: user
+      confidence: medium
+      evidence_class: self-report
+    - value: "项目连续三次无法独立完成"
+      source: user
+      confidence: medium
+      evidence_class: self-report
+  decisions:
+    - decision: needs_remediation
+      reason: "测验成绩属于理解或活动证据，不能替代真实项目中的独立行为证据。"
+    - rollback_target: gap-analysis
+      reason: "需要先核验当前基线，并定位导致独立项目失败的最早能力缺口。"
+    - decision: "暂不增加高级理论；优先采用指导逐步撤除、变式练习、调试复盘和独立重测。"
+  evidence_refs: []
+  assumptions:
+    - value: "三次项目失败可能反映独立迁移、修改或调试能力不足，而非理论知识不足。"
+      source: inference
+      confidence: medium
+  confidence: medium
+  artifacts_written: []
+  affected_downstream:
+    - competency-design
+    - curriculum-design
+    - project-design
+    - weekly-planner
+  gate:
+    passed: false
+    missing:
+      - "最近一次项目的任务说明与提交物"
+      - "失败位置、所获帮助及评价反馈的可核验记录"
+      - "独立完成、解释、修改和调试行为的直接观察证据"
+  next_action: "提交最近一次失败项目的任务说明、提交物，以及卡住位置或反馈记录，用于完成最小判别评估。"
+```
+````
+
 ## Baseline comparison
 
 | Scenario | Baseline | First post-Skill | Final post-Skill | Failure-mode change |
@@ -588,9 +768,9 @@ engine_result:
 | `direct-course-request` | 0/3 | 2/3 | 3/3 | Resource-first drift removed. The first post-Skill response correctly blocked the catalog but omitted the provisional-draft offer; the direct discovery output contract closed that observed gap. |
 | `completion-is-not-capability` | 2/3 | 3/3 | 3/3 | Completion-as-capability drift removed: public capability claims are withheld, self-report is labeled, and performance evidence is requested. |
 | `impossible-constraint` | 3/3 | 3/3 | 3/3 | Constraint denial remains absent; the response quantifies capacity, rejects an Offer promise, and exposes trade-offs. |
-| `goal-pivot` | 2/3 | 2/3 | 3/3 | Incremental-plan drift remains absent, and the previously adjacent version-loss failure is now closed with an explicit change record. |
-| `theory-practice-gap` | 3/3 | 3/3 | 3/3 | Theory escalation remains absent; project failure triggers causal rollback and guided-to-independent practice. |
+| `goal-pivot` | 2/3 | 2/3 | 3/3 | The first retest remained 2/3 because `pending` was not a version identifier. The corrected-routing review retest closes version loss with `unknown` plus a deterministic candidate draft ID and an honest empty write list. |
+| `theory-practice-gap` | 3/3 | 3/3 | 3/3 | The corrected-routing review retest confirms theory escalation remains absent; project failure triggers causal rollback and guided-to-independent practice. |
 
 ## Final decision
 
-**PASS — 15/15 required behaviors.** The first failed post-Skill observations and final passing observations are both retained above. No hypothetical rule was added: both reference changes correspond directly to a recorded first-run failure.
+**PASS — 15/15 required behaviors, using the latest valid attempt for each scenario.** The first failures, the invalidated goal-pivot retest, and the final passing observations are all retained above. The final evidence set is: direct-course first retest 3/3, completion first run 3/3, impossible-constraint first run 3/3, goal-pivot review-correction retest 3/3, and theory-practice review-correction retest 3/3.
