@@ -1,5 +1,7 @@
 from pathlib import Path
+import re
 import unittest
+from urllib.parse import unquote
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -11,6 +13,33 @@ def read_text(path: str) -> str:
 
 
 class OpenSourcePackageTests(unittest.TestCase):
+    def test_readme_pair_and_version_surface(self):
+        self.assertFalse((REPO_ROOT / "README.zh-CN.md").exists())
+        chinese = read_text("README.md")
+        english = read_text("README.en.md")
+        for text in (chinese, english):
+            self.assertIn("1.0.0", text)
+            self.assertIn("MIT", text)
+            self.assertIn("ZJSkills", text)
+        self.assertIn("[English](README.en.md)", chinese)
+        self.assertIn("[简体中文](README.md)", english)
+
+    def test_all_relative_markdown_links_resolve(self):
+        documents = [REPO_ROOT / "README.md", REPO_ROOT / "README.en.md"]
+        documents.extend(sorted((REPO_ROOT / "docs").glob("*.md")))
+        documents.append(REPO_ROOT / "CONTRIBUTING.md")
+        pattern = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
+        broken = []
+        for document in documents:
+            for raw_target in pattern.findall(document.read_text(encoding="utf-8")):
+                target = raw_target.split("#", 1)[0].strip()
+                if not target or target.startswith(("http://", "https://", "mailto:")):
+                    continue
+                resolved = (document.parent / unquote(target)).resolve()
+                if not resolved.exists():
+                    broken.append(f"{document.relative_to(REPO_ROOT)} -> {raw_target}")
+        self.assertEqual(broken, [])
+
     def test_base_open_source_files_and_mit_license(self):
         for path in ("LICENSE", "VERSION", "CONTRIBUTING.md"):
             self.assertTrue((REPO_ROOT / path).is_file(), path)
