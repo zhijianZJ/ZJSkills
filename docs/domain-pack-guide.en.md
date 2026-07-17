@@ -2,7 +2,7 @@
 
 A Domain Pack is a replaceable, versioned occupational reference. It gives Learning Architect target outcomes, competency levels, dependencies, project archetypes, assessment patterns, outcome preparation, and dated external assumptions. It is not timeless truth, a learner fact, or a required paid-course catalog.
 
-Before editing, read the [Domain Pack contract](../learning-architect/references/domain-pack-contract.md), [Domain Pack schema](../learning-architect/assets/schemas/domain-pack.schema.yaml), and the existing [AI Agent Engineer example](../learning-architect/assets/domain-packs/ai-agent.yaml).
+Before editing, read the [Domain Pack contract](../learning-architect/references/domain-pack-contract.md), [Domain Pack schema](../learning-architect/assets/schemas/domain-pack.schema.yaml), and the existing [AI Agent Engineer example](../learning-architect/assets/domain-packs/ai-agent.yaml). Name a new pack after its stable ID at `learning-architect/assets/domain-packs/<stable-id>.yaml`; add tests under `tests/learning-architect/` and privacy-safe samples under its `fixtures/` directory when needed.
 
 ## Data contract
 
@@ -53,7 +53,7 @@ Outcome preparation defines route-specific minimum evidence, artifacts, and read
 
 ## Sources, review, and migration
 
-Prefer primary, traceable sources matched to the target geography and date. Record a specific claim, not merely a link. Set an appropriate review interval. Material changes in tools, regulation, role demand, or evaluation practice update the pack and trigger rechecks from Gap through Project, Roadmap, and Outcome Preparation as affected.
+Prefer primary, traceable sources matched to the target geography and date. Record a specific claim, not merely a link. Set an appropriate review interval. `next_review_at` must not be earlier than the validation date; once that date has passed, the assumption requires review. Material changes in tools, regulation, role demand, or evaluation practice update the pack and trigger rechecks from Gap through Project, Roadmap, and Outcome Preparation as affected.
 
 Keep a changelog and migration map for every material revision. Consuming engines cite pack ID and version and distinguish copied domain facts from learner-specific inference. A missing, stale, contradictory, or insufficient-confidence pack returns `needs_input` instead of silently guessing.
 
@@ -61,7 +61,7 @@ Resource catalogs are optional and replaceable. If included, record coverage, li
 
 ## Validation and contribution
 
-Run from the repository root:
+Validation requires Python 3.9+ with `PyYAML`, `jsonschema`, and `referencing`. Run from the repository root:
 
 ```bash
 python3 learning-architect/scripts/validate_learning_system.py --skill-root learning-architect

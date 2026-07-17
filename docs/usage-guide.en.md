@@ -52,6 +52,8 @@ Whenever `gate.missing` is non-empty, `gate.passed` remains `false`. Use `needs_
 
 Persistent artifacts retain a stable `id` and increment `content_version`. Material changes create a new version; old versions become `superseded` or archived instead of being overwritten. Resume from the earliest failed gate without rebuilding validated upstream decisions.
 
+The Skill assumes no global or automatic storage directory. To continue across tasks, name a learner workspace you authorize and ask it to persist the entry state as `system-state.yaml` in that directory; other schema-backed artifacts live in the same workspace or its subdirectories. If the current tool cannot write files, state remains in the conversation and `artifacts_written` must be empty. In a new task, provide the workspace path again and ask the Skill to read and validate `system-state.yaml` first.
+
 Before writing, compare the loaded active version and timestamp or content hash with the file on disk. On an external modification, stop automatic overwrite, preserve both states, and request a merge decision. Preserve corrupt state and a recovery trace; if no valid version can be identified deterministically, return `blocked` instead of inventing one.
 
 ## Evidence and capability judgment

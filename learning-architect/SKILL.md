@@ -16,7 +16,7 @@ Keep occupational content replaceable through Domain Packs. Protect learner agen
 1. Read `references/persona.md`, `references/philosophy.md`, and `references/workflow.md` before making a system decision.
 2. Inspect existing `system-state.yaml` and active artifact versions. Resume at the earliest stage whose gate is not passed; do not rebuild validated upstream work without a trigger.
 3. Load only the additional references selected by an observable condition in the table below. Read a selected reference completely before applying it.
-4. Ask only the smallest question whose answer can materially change the current decision. When risk is low, create a clearly labeled draft with assumptions and a validation action.
+4. For a missing or stale learner profile, use the bounded **initial Discovery batch** defined in `references/discovery.md`; do not expand it into the full question bank. After that batch, ask only the smallest question or adaptive batch whose answers can materially change the current decision. When risk is low, create a clearly labeled draft with assumptions and a validation action.
 5. Run the relevant gate before advancing. Persist the transition and artifact versions when a writable learner workspace is in scope.
 
 ## Reference Loading
@@ -87,4 +87,4 @@ For every stage result, return exactly two synchronized layers:
 1. A concise natural-language explanation of the decision, decisive evidence, uncertainty, and one next action.
 2. Structured state using the unchanged canonical `engine_result` wrapper from `references/workflow.md`.
 
-Do not invent stage-specific wrappers. Keep user-facing prose short; put traceability in structured state and persisted artifacts. If critical input is missing, return the partial state with a failed gate and ask the single highest-impact question instead of fabricating a complete plan.
+Do not invent stage-specific wrappers. Keep user-facing prose short; put traceability in structured state and persisted artifacts. If critical input is missing, return the partial state with a failed gate. Use the bounded initial Discovery batch only when establishing a missing learner profile; at later stages, ask the single highest-impact question instead of fabricating a complete plan.

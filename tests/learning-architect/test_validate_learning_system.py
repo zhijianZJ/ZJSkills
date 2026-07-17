@@ -725,6 +725,8 @@ class LearningSystemValidationTests(unittest.TestCase):
         ).read_text(encoding="utf-8")
         self.assertIn("8–12", text)
         self.assertIn("adaptive follow-up", text)
+        skill_text = (self.skill_root / "SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("initial Discovery batch", skill_text)
 
     def test_discovery_question_bank_contract(self):
         path = self.skill_root / "assets" / "question-banks" / "discovery.yaml"

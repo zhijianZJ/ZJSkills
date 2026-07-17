@@ -51,10 +51,10 @@ Once the critical inputs are clear, request the first complete system:
 Using the confirmed information, create version 1 of the complete learning system: target outcome, capability gaps, competency tree, dependency graph, project ladder, phased roadmap, next weekly plan, assessment criteria, and replanning triggers. Separate facts, self-reports, evidence, inference, and assumptions, and show every gate that has not passed.
 ```
 
-You can resume without starting over:
+You can resume without starting over. For cross-task persistence, name a learner workspace you authorize and ask for `system-state.yaml` to be written there. The Skill does not select a global storage location, and it must not claim persistence when file writes are unavailable.
 
 ```text
-Continue the previous Learning Architect state from the earliest stage whose gate has not passed.
+Read and validate [learner workspace path]/system-state.yaml, then continue the previous Learning Architect state from the earliest stage whose gate has not passed.
 ```
 
 ```text

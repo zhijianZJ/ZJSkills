@@ -2,7 +2,7 @@
 
 Domain Pack 是可替换、可版本化的职业或领域参考包。它为 Learning Architect 提供目标结果、能力等级、依赖关系、项目原型、测评方式、结果准备和带日期的外部假设，但不是永恒真理、学习者事实或付费课程目录。
 
-开始前请阅读 [Domain Pack 契约](../learning-architect/references/domain-pack-contract.md)、[Domain Pack Schema](../learning-architect/assets/schemas/domain-pack.schema.yaml) 和现有的 [AI Agent Engineer 示例](../learning-architect/assets/domain-packs/ai-agent.yaml)。
+开始前请阅读 [Domain Pack 契约](../learning-architect/references/domain-pack-contract.md)、[Domain Pack Schema](../learning-architect/assets/schemas/domain-pack.schema.yaml) 和现有的 [AI Agent Engineer 示例](../learning-architect/assets/domain-packs/ai-agent.yaml)。新 Pack 使用稳定 ID 命名，保存为 `learning-architect/assets/domain-packs/<stable-id>.yaml`；相应测试放在 `tests/learning-architect/`，需要样例时使用该目录下脱敏的 `fixtures/`。
 
 ## 数据契约
 
@@ -53,7 +53,7 @@ Domain Pack 是可替换、可版本化的职业或领域参考包。它为 Lear
 
 ## 资料、评审与迁移
 
-优先使用一手、可追溯且与目标地区和日期匹配的来源。记录具体主张，而不是只列链接。资料可能变化时设置合理复查间隔；工具、监管、岗位需求或评估方式发生物质变化，应更新 Pack 并重新检查 Gap、Competency、Curriculum、Project、Roadmap 与 Outcome Preparation。
+优先使用一手、可追溯且与目标地区和日期匹配的来源。记录具体主张，而不是只列链接。资料可能变化时设置合理复查间隔；`next_review_at` 不得早于验证当天，超过该日期即视为需要复查。工具、监管、岗位需求或评估方式发生物质变化，应更新 Pack 并重新检查 Gap、Competency、Curriculum、Project、Roadmap 与 Outcome Preparation。
 
 对每次变化保留变更说明和迁移表。消费引擎必须引用 Pack 的 ID 与版本，区分复制的领域事实和对学习者的推断。Pack 缺失、过期、矛盾或低于所需置信度时返回 `needs_input`，不要静默猜测。
 
@@ -61,7 +61,7 @@ Domain Pack 是可替换、可版本化的职业或领域参考包。它为 Lear
 
 ## 验证与提交
 
-在仓库根目录运行：
+验证命令需要 Python 3.9+，以及 `PyYAML`、`jsonschema` 和 `referencing`。在仓库根目录运行：
 
 ```bash
 python3 learning-architect/scripts/validate_learning_system.py --skill-root learning-architect

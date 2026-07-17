@@ -2,7 +2,7 @@
 
 [English](README.en.md)
 
-**版本 1.0.0 · 84 tests · MIT**
+**版本 [1.0.0](VERSION) · 84 tests 核心回归 / 92 tests 总计 · MIT**
 
 把模糊的学习目标转化为可验证、可调整的个性化学习系统。
 
@@ -29,14 +29,40 @@
 
 ## 安装
 
-将仓库中的 Skill 目录复制到 Codex Skills 目录：
+先获取仓库，并在仓库根目录执行安装命令：
 
 ```bash
-mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
-cp -R ./learning-architect "${CODEX_HOME:-$HOME/.codex}/skills/"
+git clone https://github.com/king-wsc/LearningArchitectSklls.git
+cd LearningArchitectSklls
+(
+  set -e
+  skills_dir="${CODEX_HOME:-$HOME/.codex}/skills"
+  destination="$skills_dir/learning-architect"
+  if [ -e "$destination" ]; then
+    echo "安装已停止：$destination 已存在，请先备份或选择升级流程。" >&2
+    exit 1
+  fi
+  mkdir -p "$skills_dir"
+  cp -R ./learning-architect "$skills_dir/"
+  test -f "$destination/SKILL.md"
+)
 ```
 
-安装后，在新任务中明确要求使用 `Learning Architect`。其他支持 Skills 的工具可按各自的本地 Skill 安装方式导入同一目录。
+整个括号命令没有报错且退出状态为 0，表示目标原本不存在且 `SKILL.md` 已复制成功；如果目标已存在，它会停止而不会复制。安装后请新建任务，并明确要求使用 `Learning Architect`；如果客户端缓存 Skills，请按该客户端说明重新加载或重启。
+
+升级时不要把新目录直接合并进旧目录。先把已安装目录移到你指定的备份位置，再复制新版本；验证无误前保留备份，避免覆盖本地修改。卸载只需在确认不再需要本地修改后移走已安装目录。
+
+其他工具只有在兼容同类 `SKILL.md` 目录约定时才可能复用该目录；请以对应工具的官方安装说明为准，本项目不声明未经测试的客户端兼容性。
+
+维护者与贡献者可在仓库根目录验证完整项目：
+
+```bash
+python3 "${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-creator/scripts/quick_validate.py" learning-architect
+python3 -m unittest discover -s tests/learning-architect -p "test_*.py" -q
+python3 learning-architect/scripts/validate_learning_system.py --skill-root learning-architect --learner-dir tests/learning-architect/fixtures/valid-learner
+```
+
+验证器需要 Python 3.9+，以及 `PyYAML`、`jsonschema` 和 `referencing`。第一条命令依赖 Codex 内置的 `skill-creator`；没有该路径时可运行后两条仓库验证命令。
 
 ## 你会得到什么
 
@@ -72,7 +98,7 @@ cp -R ./learning-architect "${CODEX_HOME:-$HOME/.codex}/skills/"
 | [`learning-architect/references/`](learning-architect/references/) | 发现、能力、课程、项目、测评与优化引擎 |
 | [`learning-architect/assets/`](learning-architect/assets/) | Schema、模板与 Domain Pack |
 | [`learning-architect/scripts/`](learning-architect/scripts/) | 离线学习系统验证器 |
-| [`tests/learning-architect/`](tests/learning-architect/) | 84 项回归测试及有效、无效样例 |
+| [`tests/learning-architect/`](tests/learning-architect/) | 84 项核心回归测试、8 项开源封装测试及有效、无效样例 |
 | [`docs/`](docs/) | 中英文使用与扩展文档 |
 
 ## 贡献

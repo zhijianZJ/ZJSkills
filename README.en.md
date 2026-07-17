@@ -2,7 +2,7 @@
 
 [简体中文](README.md)
 
-**Version 1.0.0 · 84 tests · MIT**
+**Version [1.0.0](VERSION) · 84 core regression tests / 92 total tests · MIT**
 
 Turn an ambiguous learning goal into a verifiable, adaptable, personalized learning system.
 
@@ -29,14 +29,40 @@ See [Getting Started](docs/getting-started.en.md) for prompts covering first use
 
 ## Install
 
-Copy the repository's Skill directory into the Codex Skills directory:
+Get the repository, then run the installation commands from the repository root:
 
 ```bash
-mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
-cp -R ./learning-architect "${CODEX_HOME:-$HOME/.codex}/skills/"
+git clone https://github.com/king-wsc/LearningArchitectSklls.git
+cd LearningArchitectSklls
+(
+  set -e
+  skills_dir="${CODEX_HOME:-$HOME/.codex}/skills"
+  destination="$skills_dir/learning-architect"
+  if [ -e "$destination" ]; then
+    echo "Installation stopped: $destination already exists; back it up or use the upgrade flow first." >&2
+    exit 1
+  fi
+  mkdir -p "$skills_dir"
+  cp -R ./learning-architect "$skills_dir/"
+  test -f "$destination/SKILL.md"
+)
 ```
 
-After installation, explicitly ask for `Learning Architect` in a new task. Other Skill-capable tools can import the same directory using their local Skill installation method.
+The parenthesized command exits successfully only when the destination was absent and `SKILL.md` was copied; an existing destination stops the copy with an error. After installation, open a new task and explicitly ask for `Learning Architect`. If the client caches Skills, reload or restart it according to that client's documentation.
+
+For an upgrade, do not merge the new directory into the old one. Move the installed directory to a backup location you control, copy the new version, and keep the backup until verification succeeds so local modifications are not silently overwritten. To uninstall, move the installed directory away only after preserving any changes you need.
+
+Other tools may reuse the directory only if they support a compatible `SKILL.md` directory convention. Follow that tool's official installation documentation; this project does not claim compatibility with untested clients.
+
+Maintainers and contributors can validate the complete repository from its root:
+
+```bash
+python3 "${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-creator/scripts/quick_validate.py" learning-architect
+python3 -m unittest discover -s tests/learning-architect -p "test_*.py" -q
+python3 learning-architect/scripts/validate_learning_system.py --skill-root learning-architect --learner-dir tests/learning-architect/fixtures/valid-learner
+```
+
+The validator requires Python 3.9+ with `PyYAML`, `jsonschema`, and `referencing`. The first command uses Codex's bundled `skill-creator`; if that path is unavailable, run the latter two repository checks.
 
 ## What you get
 
@@ -73,7 +99,7 @@ Each stage has entry conditions, artifacts, and a gate. When evidence is insuffi
 | [`learning-architect/references/`](learning-architect/references/) | Discovery, competency, curriculum, project, assessment, and optimization engines |
 | [`learning-architect/assets/`](learning-architect/assets/) | Schemas, templates, and Domain Packs |
 | [`learning-architect/scripts/`](learning-architect/scripts/) | Offline learning-system validator |
-| [`tests/learning-architect/`](tests/learning-architect/) | 84 regression tests plus valid and invalid fixtures |
+| [`tests/learning-architect/`](tests/learning-architect/) | 84 core regression tests, 8 open-source package tests, and valid/invalid fixtures |
 | [`docs/`](docs/) | Chinese and English usage and extension guides |
 
 ## Contributing
