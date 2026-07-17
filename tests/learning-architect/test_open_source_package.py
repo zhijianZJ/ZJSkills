@@ -67,6 +67,42 @@ class OpenSourcePackageTests(unittest.TestCase):
             for phrase in phrases:
                 self.assertIn(phrase, text, f"{path}: {phrase}")
 
+    def test_english_document_set_is_complete(self):
+        required = {
+            "docs/getting-started.en.md": (
+                "# Learning Architect Getting Started",
+                "## First use",
+                "## Why it asks before planning",
+                "## How to continue",
+                "## How to replan",
+            ),
+            "docs/usage-guide.en.md": (
+                "# Learning Architect Full Usage Guide",
+                "## Complete workflow",
+                "## Artifacts and structured state",
+                "## Evidence and capability judgment",
+                "## Failure and safety boundaries",
+            ),
+            "docs/examples.en.md": (
+                "# Learning Architect Scenarios and Prompts",
+                "## Scenario 1: Explore the AI industry from zero",
+                "## Scenario 2: Transition to AI Agent Engineer",
+                "## Scenario 3: Transition to AI Product Manager",
+                "## Scenario 4: Apply AI in current work",
+            ),
+            "docs/domain-pack-guide.en.md": (
+                "# Domain Pack Extension Guide",
+                "## Data contract",
+                "## Competencies and dependencies",
+                "## Project archetypes and rubric gates",
+                "## Validation and contribution",
+            ),
+        }
+        for path, phrases in required.items():
+            text = read_text(path)
+            for phrase in phrases:
+                self.assertIn(phrase, text, f"{path}: {phrase}")
+
 
 if __name__ == "__main__":
     unittest.main()
