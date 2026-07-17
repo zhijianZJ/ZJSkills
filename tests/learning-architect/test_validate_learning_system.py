@@ -155,6 +155,71 @@ class LearningSystemValidationTests(unittest.TestCase):
                 )
             )
 
+            for current_stage in ("assessment", "continuous-optimization"):
+                with self.subTest(root_only_stage=current_stage):
+                    root_only = temporary_root / f"root-only-{current_stage}"
+                    root_only.mkdir()
+                    state = yaml.safe_load(
+                        (self.fixtures / "valid-learner" / "system-state.yaml").read_text(
+                            encoding="utf-8"
+                        )
+                    )
+                    state["current_stage"] = current_stage
+                    for stage in self.validator.CANONICAL_STAGES:
+                        if stage == current_stage:
+                            state["stage_states"][stage] = {"state": "active"}
+                        elif self.validator.CANONICAL_STAGES.index(stage) < self.validator.CANONICAL_STAGES.index(current_stage):
+                            state["stage_states"][stage] = {"state": "validated"}
+                        else:
+                            state["stage_states"][stage] = {"state": "not_started"}
+                    state["active_versions"] = {"system-state": 1}
+                    (root_only / "system-state.yaml").write_text(
+                        yaml.safe_dump(state), encoding="utf-8"
+                    )
+                    root_only_errors = self.validator.validate_learner_system(
+                        self.skill_root, root_only
+                    )
+                    self.assertTrue(
+                        any(
+                            "Stage discovery is validated but requires active learner-profile"
+                            in error
+                            for error in root_only_errors
+                        ),
+                        root_only_errors,
+                    )
+
+        stage_artifact_cases = (
+            ("discovery", "learner-profile", "learner-profile.yaml"),
+            ("goal-analysis", "target-outcome", "target-outcome.yaml"),
+            ("competency-design", "competency-model", "competency-model.yaml"),
+            ("curriculum-design", "curriculum-graph", "curriculum-graph.yaml"),
+            ("project-design", "project", None),
+            ("roadmap", "learning-roadmap", None),
+            ("weekly-planner", "weekly-plan", None),
+            ("assessment", "assessment", "assessment.yaml"),
+            ("outcome-preparation", "evidence", "evidence.yaml"),
+            ("continuous-optimization", "optimization-state", None),
+        )
+        for stage, artifact_type, artifact_file in stage_artifact_cases:
+            with self.subTest(stage_missing_artifact=stage), self.copied_valid_learner() as learner_dir:
+                state_path = learner_dir / "system-state.yaml"
+                state = yaml.safe_load(state_path.read_text(encoding="utf-8"))
+                state["stage_states"][stage] = {"state": "validated"}
+                state_path.write_text(yaml.safe_dump(state), encoding="utf-8")
+                if artifact_file is not None:
+                    (learner_dir / artifact_file).unlink()
+                stage_errors = self.validator.validate_learner_system(
+                    self.skill_root, learner_dir
+                )
+                self.assertTrue(
+                    any(
+                        f"Stage {stage} is validated but requires active {artifact_type}"
+                        in error
+                        for error in stage_errors
+                    ),
+                    stage_errors,
+                )
+
     def test_skill_entrypoint_exposes_progressive_workflow_contract(self):
         skill_path = self.skill_root / "SKILL.md"
         self.assertTrue(skill_path.is_file(), f"Missing Skill entrypoint: {skill_path}")
@@ -360,10 +425,15 @@ class LearningSystemValidationTests(unittest.TestCase):
 
     def test_adaptive_engine_semantics_are_executable(self):
         references = self.skill_root / "references"
+        curriculum = (references / "curriculum-engine.md").read_text(encoding="utf-8")
+        project = (references / "project-engine.md").read_text(encoding="utf-8")
         roadmap = (references / "roadmap-engine.md").read_text(encoding="utf-8")
         assessment = (references / "assessment-engine.md").read_text(encoding="utf-8")
         outcome = (references / "outcome-engine.md").read_text(encoding="utf-8")
         optimization = (references / "optimization-engine.md").read_text(encoding="utf-8")
+
+        self.assertIn("positive integer `content_version`", curriculum)
+        self.assertIn("positive integer `content_version`", project)
 
         for token in [
             "weekly_delivery_hours[week]",
@@ -971,6 +1041,18 @@ class LearningSystemValidationTests(unittest.TestCase):
     def test_ai_agent_pack_is_acyclic_and_has_no_paid_course_recommendations(self):
         pack = self.load_ai_agent_domain_pack()
         self.assertFalse(self.validator._has_dependency_cycle(pack["dependencies"]))
+        deep_dependencies = [
+            {"from": f"node-{index}", "to": f"node-{index + 1}"}
+            for index in range(2000)
+        ]
+        try:
+            self.assertFalse(
+                self.validator._has_dependency_cycle(deep_dependencies)
+            )
+        except RecursionError as exc:
+            self.fail(f"Deep acyclic dependency graphs must not recurse: {exc}")
+        deep_dependencies.append({"from": "node-2000", "to": "node-0"})
+        self.assertTrue(self.validator._has_dependency_cycle(deep_dependencies))
         pack_text = yaml.safe_dump(pack).lower()
         for forbidden in [
             "udemy.com/course/",

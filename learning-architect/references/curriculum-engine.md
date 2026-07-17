@@ -24,6 +24,6 @@ Resources are replaceable catalog entries, never hard-coded requirements. Each e
 
 ## Version and gate
 
-Use semantic versioning, stable unit IDs, `last_reviewed_at`, source-dated market assumptions, and migration maps for renamed, split, merged, or retired nodes. Re-run cycle and endpoint validation after every change. Pass only when the graph is acyclic, every endpoint exists, every unit serves a gap, resource choices are replaceable, and each core target has a path to evidence.
+Use a positive integer `content_version` for each curriculum artifact revision and stable unit IDs across revisions. Use SemVer only for the source Domain Pack `version`; keep its `last_reviewed_at`, source-dated market assumptions, and migration maps for renamed, split, merged, or retired nodes. Re-run cycle and endpoint validation after every change. Pass only when the graph is acyclic, every endpoint exists, every unit serves a gap, resource choices are replaceable, and each core target has a path to evidence.
 
 Return a natural-language explanation and the canonical `engine_result` from `workflow.md` with `engine: curriculum-design`, `confidence: low | medium | high`, the graph artifact, affected downstream projects and plans, gate status, and one concrete next action.

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+from collections import deque
 from datetime import date, datetime, timedelta
 from pathlib import Path
 import re
@@ -400,24 +401,24 @@ def _validate_domain_pack_semantics(
 
 def _has_dependency_cycle(dependencies: list[dict[str, str]]) -> bool:
     graph: dict[str, list[str]] = {}
+    indegree: dict[str, int] = {}
     for edge in dependencies:
         graph.setdefault(edge["from"], []).append(edge["to"])
         graph.setdefault(edge["to"], [])
+        indegree.setdefault(edge["from"], 0)
+        indegree[edge["to"]] = indegree.get(edge["to"], 0) + 1
 
-    state: dict[str, int] = {}
+    ready = deque(node for node in graph if indegree.get(node, 0) == 0)
+    visited = 0
+    while ready:
+        node = ready.popleft()
+        visited += 1
+        for neighbor in graph[node]:
+            indegree[neighbor] -= 1
+            if indegree[neighbor] == 0:
+                ready.append(neighbor)
 
-    def visit(node: str) -> bool:
-        if state.get(node) == 1:
-            return True
-        if state.get(node) == 2:
-            return False
-        state[node] = 1
-        if any(visit(neighbor) for neighbor in graph[node]):
-            return True
-        state[node] = 2
-        return False
-
-    return any(visit(node) for node in graph if state.get(node, 0) == 0)
+    return visited != len(graph)
 
 
 def validate_learner_system(skill_root: Path, learner_dir: Path) -> list[str]:
@@ -798,6 +799,29 @@ def validate_learner_system(skill_root: Path, learner_dir: Path) -> list[str]:
             illegal.append(f"current {current_stage}={current_value}")
         if illegal:
             errors.append("Illegal stage progression: " + ", ".join(illegal))
+
+        stage_artifact_requirements = {
+            "discovery": ("learner-profile",),
+            "goal-analysis": ("target-outcome",),
+            "competency-design": ("competency-model",),
+            "curriculum-design": ("curriculum-graph",),
+            "project-design": ("project",),
+            "roadmap": ("learning-roadmap",),
+            "weekly-planner": ("weekly-plan",),
+            "assessment": ("assessment",),
+            "outcome-preparation": ("evidence",),
+            "continuous-optimization": ("optimization-state",),
+        }
+        for stage, required_artifact_types in stage_artifact_requirements.items():
+            stage_state = stage_states.get(stage, {}).get("state")
+            if stage_state not in {"validated", "active"}:
+                continue
+            for artifact_type in required_artifact_types:
+                if not current_artifacts.get(artifact_type):
+                    errors.append(
+                        f"Stage {stage} is {stage_state} but requires active "
+                        f"{artifact_type}"
+                    )
 
         singleton_coverage: dict[tuple[str, str, int], int] = {}
         for artifact_name, active_version in system_state.get("active_versions", {}).items():

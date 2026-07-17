@@ -27,6 +27,6 @@ Maintain a matrix with one row per core competency and columns for target L0–L
 
 ## Version and gate
 
-Use semantic versions, stable IDs, `last_reviewed_at`, source-dated market assumptions, and migration maps. A changed competency ID or level recomputes the coverage matrix; a changed target or constraint revalidates business value and feasibility.
+Use a positive integer `content_version` for each project artifact revision and stable project IDs across revisions. Use SemVer only for the source Domain Pack `version`, with its `last_reviewed_at`, source-dated market assumptions, and migration maps. A changed competency ID or level recomputes the coverage matrix; a changed target or constraint revalidates business value and feasibility.
 
 Pass only when six archetypes are represented, coverage is complete, business value is testable, rubrics name thresholds, and the evidence plan is feasible and ethical. Return a natural-language explanation plus the canonical `engine_result` from `workflow.md` with `engine: project-design`, enum confidence, affected downstream roadmap and assessment artifacts, and one next action.
