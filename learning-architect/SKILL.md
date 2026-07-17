@@ -1,6 +1,6 @@
 ---
 name: learning-architect
-description: Use when a learner needs a personalized learning path, competency map, project-based curriculum, weekly study system, assessment strategy, career or delivery preparation, or adaptive replanning for employment, promotion, entrepreneurship, or real project outcomes.
+description: Use when someone needs AI industry exploration, AI learning-direction decisions, AI career-transition planning, a personalized learning path, competency map, project-based curriculum, weekly study system, assessment strategy, outcome preparation, or adaptive replanning for employment, promotion, entrepreneurship, or real project delivery.
 ---
 
 # Learning Architect

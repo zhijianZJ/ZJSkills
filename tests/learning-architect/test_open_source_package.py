@@ -132,6 +132,30 @@ class OpenSourcePackageTests(unittest.TestCase):
             for phrase in phrases:
                 self.assertIn(phrase, text, f"{path}: {phrase}")
 
+    def test_skill_metadata_covers_ai_exploration_and_transition(self):
+        skill = read_text("learning-architect/SKILL.md")
+        for phrase in (
+            "AI industry exploration",
+            "AI learning-direction decisions",
+            "AI career-transition planning",
+            "personalized learning path",
+        ):
+            self.assertIn(phrase, skill)
+
+    def test_runtime_skill_is_brand_and_promotion_neutral(self):
+        forbidden = ("ZJSkills", "智建", "社群", "community link", "课程推广")
+        violations = []
+        for path in RUNTIME_ROOT.rglob("*"):
+            if not path.is_file() or "__pycache__" in path.parts:
+                continue
+            if path.suffix.lower() not in {".md", ".yaml", ".yml", ".txt", ".py"}:
+                continue
+            text = path.read_text(encoding="utf-8", errors="ignore")
+            for phrase in forbidden:
+                if phrase in text:
+                    violations.append(f"{path.relative_to(REPO_ROOT)}: {phrase}")
+        self.assertEqual(violations, [])
+
 
 if __name__ == "__main__":
     unittest.main()
