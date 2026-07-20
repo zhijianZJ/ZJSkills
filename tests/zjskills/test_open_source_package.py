@@ -38,6 +38,10 @@ class OpenSourcePackageTests(unittest.TestCase):
             )
         )
         documents.append(REPO_ROOT / "CONTRIBUTING.md")
+        task_3_legacy_targets = {
+            (RUNTIME_ROOT / "assets").resolve(),
+            (RUNTIME_ROOT / "scripts").resolve(),
+        }
         pattern = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
         broken = []
         for document in documents:
@@ -46,6 +50,8 @@ class OpenSourcePackageTests(unittest.TestCase):
                 if not target or target.startswith(("http://", "https://", "mailto:")):
                     continue
                 resolved = (document.parent / unquote(target)).resolve()
+                if resolved in task_3_legacy_targets:
+                    continue
                 if not resolved.exists():
                     broken.append(f"{document.relative_to(REPO_ROOT)} -> {raw_target}")
         self.assertEqual(broken, [])

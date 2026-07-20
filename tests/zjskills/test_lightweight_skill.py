@@ -108,6 +108,13 @@ class LightweightSkillTests(unittest.TestCase):
             ["career diagnosis", "learning route", "learning help"],
         )
 
+    def test_skill_chooses_exactly_one_mode_for_each_request(self):
+        skill = read_runtime("SKILL.md")
+        self.assert_contract_phrase(
+            skill, "Choose exactly one mode for each user request."
+        )
+        self.assertNotIn("multiple modes by default", skill.lower())
+
     def test_skill_uses_context_first_entry_and_zero_or_one_question(self):
         skill = read_runtime("SKILL.md")
         for phrase in (
@@ -117,6 +124,15 @@ class LightweightSkillTests(unittest.TestCase):
             "Reuse facts, goals, constraints, prior conclusions, and feedback already supplied.",
             "If evidence is sufficient, work immediately.",
             "If one missing fact could change the judgment, ask only that one question.",
+        ):
+            self.assert_contract_phrase(skill, phrase)
+
+    def test_skill_states_the_non_ai_domain_boundary(self):
+        skill = read_runtime("SKILL.md")
+        for phrase in (
+            "Domain standards, market facts, licensing requirements, safety rules, and readiness criteria may be unknown or unestablished.",
+            "Request the smallest reliable source, rubric, or qualified feedback needed.",
+            "Never impersonate a domain expert.",
         ):
             self.assert_contract_phrase(skill, phrase)
 
