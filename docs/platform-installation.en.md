@@ -10,7 +10,7 @@ This guide applies to ZJSkills 3.0.0. The technical directory and Skill name are
 | --- | --- | --- | --- |
 | Codex | Native Skill | User `$HOME/.agents/skills/zjskills` or project `.agents/skills/zjskills` | `$zjskills` or natural language; returns a career diagnosis |
 | Claude Code | Native Skill | User `$HOME/.claude/skills/zjskills` or project `.claude/skills/zjskills` | `/zjskills` or natural language; returns a career diagnosis |
-| Tencent WorkBuddy | Native or compatible Skill, depending on the current version | Import the local directory through the Skills UI | Select or name ZJSkills; returns a career diagnosis |
+| Tencent WorkBuddy | Manual file/context | Provide `SKILL.md` and the references needed for the current task | Explicitly request the ZJSkills workflow; returns a career diagnosis |
 | Doubao | Manual file/context | Upload runtime files in a dedicated conversation | Explicitly request the ZJSkills workflow; do not describe this as local native installation |
 | Generic file and context hosts | Manual file/context | Provide `SKILL.md` and only the references needed now | Confirm actual file access; do not assume automatic triggering |
 
@@ -87,14 +87,16 @@ Enter `/zjskills` in a new session, then describe the real situation. A correct 
 
 ## Tencent WorkBuddy
 
-WorkBuddy's Skills UI and import entry may vary by version. Prefer the explicit Import Skill, Custom Skill, or corresponding entry in the current client instead of guessing an internal directory.
+WorkBuddy's official documentation says that a custom Skill typically includes `skill.yml`, implementation files, and a README. The current ZJSkills package uses the Agent Skill `SKILL.md` structure, does not include `skill.yml`, and has no WorkBuddy-specific adaptation that has been created and tested. Therefore, this guide does not claim it is a native WorkBuddy Skill or instruct users to import the six-file directory.
 
-1. Select the whole repository `zjskills` directory.
-2. Confirm that the installation list includes `SKILL.md`, `agents/openai.yaml`, and four reference files.
-3. Review files and permissions shown by the host; do not replace a same-name Skill.
-4. Enable it, create a new task, select ZJSkills, and send the same career-diagnosis prompt used for Codex.
+For now, use manual file/context:
 
-If the current version cannot import a directory, open a task with the repository as its working directory and ask WorkBuddy to list the destination, copied files, and permissions before installing. Call it native or compatible only if the host actually registers the directory as a Skill. Files used only in the conversation are manual context.
+1. Set the repository as the task working directory, or provide `zjskills/SKILL.md` in the task.
+2. Follow the conditional routing in `SKILL.md` and provide only the reference needed for the current task.
+3. Ask WorkBuddy to name the files it actually read, then send the same career-diagnosis prompt used for Codex.
+4. Provide the necessary files and prior result again in a new task; do not assume automatic triggering or cross-task continuity.
+
+If a future WorkBuddy-specific adaptation is created with `skill.yml`, implementation files, and a README, install it through the documented custom-Skill flow and test it in a new conversation before describing that adaptation as native support.
 
 ## Doubao
 
@@ -182,5 +184,6 @@ If you encounter usage issues, planning questions, or other unresolved problems 
 
 - [Codex: Build skills](https://learn.chatgpt.com/docs/build-skills)
 - [Claude Code: Extend Claude with Skills](https://code.claude.com/docs/en/skills)
-- [Tencent WorkBuddy: features and Skills](https://www.workbuddy.ai/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Task-Bar)
+- [Tencent WorkBuddy: create custom Skills](https://www.workbuddy.ai/docs/workbuddy/From-Beginner-to-Expert-Guide/Practice-Cases/Create-Skills)
+- [Tencent WorkBuddy: Skill Marketplace](https://www.workbuddy.ai/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Skills-Market)
 - [Doubao](https://www.doubao.com/)

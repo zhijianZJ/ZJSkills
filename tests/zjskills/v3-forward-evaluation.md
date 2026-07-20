@@ -4,18 +4,18 @@ Ten outputs were produced in distinct fresh contexts from only the fixed Skill-p
 
 Question counts below count requests for missing user context, not questions embedded inside a learning exercise. Main actions count the single immediate action, not later conditional interpretation or fallback checks.
 
-| Scenario | Mode | Questions | Main actions | Evidence boundary | Neutral | Concise | Verdict |
-|---|---|---:|---:|---|---|---|---|
-| `vague-ai-transition` | Career diagnosis, decisive-question gate | 1 | 1 (name the paid result) | Pass: explicitly seeks the one fact needed before judging | Yes | Yes | PASS |
-| `compare-agent-vibe` | Career diagnosis | 0 | 1 (weekend build/deploy/debug project) | Pass: known facts, inference, and uncertainty are explicit | Yes | Yes | PASS |
-| `no-coding-evidence` | Career diagnosis | 0 | 1 (4–6 hour build-and-debug validation) | Pass: zero coding evidence limits the judgment; no employment promise | Yes | Yes | PASS |
-| `training-decision` | Career diagnosis | 0 | 1 (second project with one review) | Pass: observed project, inference, and missing transfer evidence are separate | Yes | Yes | PASS |
-| `concept-confusion` | Learning help | 0 | 1 (one retrieval-vs-context explanation exercise) | Pass: explanation distinguishes the concept and its likely confusion | Yes | Yes | PASS |
-| `incomplete-error` | Learning help, decisive-question gate | 1 | 1 (rerun and provide the complete first error) | Pass: refuses diagnosis without exact error evidence | Yes | Yes | PASS |
-| `missed-week` | Learning help | 0 | 1 (10-minute capacity review) | Pass: one-off interruption versus capacity mismatch remains uncertain | Yes | Yes | PASS |
-| `changed-goal` | Learning route | 0 | 1 (five-case before/after comparison) | Pass: starting facts, absent capability evidence, and main assumption are clear | Yes | Yes | PASS |
-| `non-ai-without-source` | Learning route, domain-evidence gate | 1 | 1 (provide employment jurisdiction) | Pass after rerun: states non-AI boundary and withholds route pending official local standards | Yes | Yes | PASS |
-| `enough-context-no-question` | Learning help | 0 | 1 (automate one reporting step) | Pass: uses supplied constraints and separates career-switch uncertainty | Yes | Yes | PASS |
+| Scenario | Mode | Questions | Main actions | Evidence boundary | Promise boundary | Neutral | Beginner readable | Concise | Verdict |
+|---|---|---:|---:|---|---|---|---|---|---|
+| `vague-ai-transition` | Career diagnosis, decisive-question gate | 1 | 1 (name the paid result) | Pass: explicitly seeks the one fact needed before judging | Pass: no external outcome claim | Yes | Yes | Yes | PASS |
+| `compare-agent-vibe` | Career diagnosis | 0 | 1 (weekend build/deploy/debug project) | Pass: known facts, inference, and uncertainty are explicit | Pass: validation is not framed as job proof | Yes | Yes | Yes | PASS |
+| `no-coding-evidence` | Career diagnosis | 0 | 1 (4–6 hour build-and-debug validation) | Pass: zero coding evidence limits the judgment | Pass: no employment or salary promise | Yes | Yes | Yes | PASS |
+| `training-decision` | Career diagnosis | 0 | 1 (second project with one review) | Pass: observed project, inference, and missing transfer evidence are separate | Pass: support is not presented as guaranteed success | Yes | Yes | Yes | PASS |
+| `concept-confusion` | Learning help | 0 | 1 (one retrieval-vs-context explanation exercise) | Pass: explanation distinguishes the concept and its likely confusion | Pass: no capability or career promise | Yes | Yes | Yes | PASS |
+| `incomplete-error` | Learning help, decisive-question gate | 1 | 1 (rerun and provide the complete first error) | Pass: refuses diagnosis without exact error evidence | Pass: no guaranteed technical result | Yes | Yes | Yes | PASS |
+| `missed-week` | Learning help | 0 | 1 (10-minute capacity review) | Pass: one-off interruption versus capacity mismatch remains uncertain | Pass: no guaranteed recovery claim | Yes | Yes | Yes | PASS |
+| `changed-goal` | Learning route | 0 | 1 (five-case before/after comparison) | Pass: starting facts, absent capability evidence, and main assumption are clear | Pass: no transition or promotion promise | Yes | Yes | Yes | PASS |
+| `non-ai-without-source` | Learning route, domain-evidence gate | 1 | 1 (provide employment jurisdiction) | Pass after rerun: states non-AI boundary and withholds route pending official local standards | Pass: no licensing or employment guarantee | Yes | Yes | Yes | PASS |
+| `enough-context-no-question` | Learning help | 0 | 1 (automate one reporting step) | Pass: uses supplied constraints and separates career-switch uncertainty | Pass: automation is not framed as career proof | Yes | Yes | Yes | PASS |
 
 ## Cross-scenario evidence notes
 

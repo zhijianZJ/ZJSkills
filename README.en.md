@@ -60,7 +60,7 @@ The technical name remains `zjskills`, and the repository URL is:
 git clone https://github.com/zhijianZJ/ZJSkills.git
 ```
 
-ZJSkills covers Codex, Claude Code, Tencent WorkBuddy, Doubao, and generic hosts that can load files or context manually. These platforms do not all provide the same Native Skill capability. Use the [multi-platform installation and usage guide](docs/platform-installation.en.md) to distinguish native installation from manual context use and complete the acceptance checks.
+ZJSkills supports Native Skill installation on Codex and Claude Code. On Tencent WorkBuddy, Doubao, and generic hosts, use this six-file package as manual file/context. Follow the [multi-platform installation and usage guide](docs/platform-installation.en.md) for setup and acceptance checks.
 
 ## Documentation
 

@@ -47,6 +47,13 @@ def read_text(path: str) -> str:
 
 
 class OpenSourcePackageTests(unittest.TestCase):
+    def level_two_section(self, text: str, heading: str) -> str:
+        marker = f"## {heading}"
+        self.assertIn(marker, text)
+        remainder = text.split(marker, 1)[1]
+        next_heading = re.search(r"(?m)^##\s+", remainder)
+        return remainder[: next_heading.start()] if next_heading else remainder
+
     def test_readme_pair_and_version_surface_3_0(self):
         self.assertFalse((REPO_ROOT / "README.zh-CN.md").exists())
         chinese = read_text("README.md")
@@ -297,6 +304,35 @@ class OpenSourcePackageTests(unittest.TestCase):
             self.assertNotIn("schema", text.lower(), path)
             for phrase in phrases:
                 self.assertIn(phrase, text, f"{path}: {phrase}")
+
+    def test_workbuddy_is_manual_context_until_a_native_adaptation_is_tested(self):
+        chinese = read_text("docs/platform-installation.md")
+        english = read_text("docs/platform-installation.en.md")
+        chinese_section = self.level_two_section(chinese, "Tencent WorkBuddy")
+        english_section = self.level_two_section(english, "Tencent WorkBuddy")
+
+        self.assertIn("| Tencent WorkBuddy | 手动文件/上下文 |", chinese)
+        self.assertIn("| Tencent WorkBuddy | Manual file/context |", english)
+        for phrase in ("skill.yml", "WorkBuddy 专用改造", "完成测试"):
+            self.assertIn(phrase, chinese_section, phrase)
+        for phrase in ("skill.yml", "WorkBuddy-specific adaptation", "tested"):
+            self.assertIn(phrase, english_section, phrase)
+
+        for phrase in ("导入本地目录", "选择仓库中的整个 `zjskills` 目录"):
+            self.assertNotIn(phrase, chinese, phrase)
+        for phrase in ("Import the local directory", "Select the whole repository `zjskills` directory"):
+            self.assertNotIn(phrase, english, phrase)
+
+    def test_workbuddy_references_official_custom_skill_and_marketplace_pages(self):
+        pages = (read_text("docs/platform-installation.md"), read_text("docs/platform-installation.en.md"))
+        official_urls = (
+            "https://www.workbuddy.ai/docs/workbuddy/From-Beginner-to-Expert-Guide/Practice-Cases/Create-Skills",
+            "https://www.workbuddy.ai/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Skills-Market",
+        )
+        for page in pages:
+            for url in official_urls:
+                self.assertIn(url, page, url)
+            self.assertNotIn("Function-Description/Task-Bar", page)
 
     def test_contributing_guide_is_bilingual_and_enforces_3_0_boundaries(self):
         text = read_text("CONTRIBUTING.md")

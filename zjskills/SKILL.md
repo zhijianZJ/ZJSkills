@@ -19,6 +19,8 @@ Read the current conversation first.
 Reuse facts, goals, constraints, prior conclusions, and feedback already supplied.
 If evidence is sufficient, work immediately.
 If one missing fact could change the judgment, ask only that one question.
+If a bare `$zjskills` or `/zjskills` invocation has no usable task or context, invite the user to describe one real situation in ordinary language. Do not display an internal menu.
+If the user asks for `新手入门`, briefly explain what they can submit, how ZJSkills processes it, and what they receive; then continue into their first real task.
 
 ## Choose One Mode
 

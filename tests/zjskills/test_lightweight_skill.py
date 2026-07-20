@@ -186,6 +186,19 @@ class LightweightSkillTests(unittest.TestCase):
         ):
             self.assert_contract_phrase(skill, phrase)
 
+    def test_skill_handles_bare_invocation_without_exposing_an_internal_menu(self):
+        start = self.level_two_section(read_runtime("SKILL.md"), "Start")
+        self.assertRegex(start, r"(?i)no usable (?:task or )?context")
+        self.assertRegex(start, r"(?i)invite .*one real situation.*ordinary language")
+        self.assertRegex(start, r"(?i)do not (?:show|display|expose).*internal menu")
+
+    def test_skill_explains_beginner_onboarding_then_enters_a_real_task(self):
+        start = self.level_two_section(read_runtime("SKILL.md"), "Start")
+        self.assertIn("新手入门", start)
+        for concept in ("what they can submit", "how ZJSkills processes it", "what they receive"):
+            self.assertIn(concept, start, concept)
+        self.assertRegex(start, r"(?i)continue .*first real task")
+
     def test_skill_states_the_non_ai_domain_boundary(self):
         skill = read_runtime("SKILL.md")
         for phrase in (
