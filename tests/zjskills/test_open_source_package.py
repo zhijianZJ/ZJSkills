@@ -3,9 +3,6 @@ import re
 import unittest
 from urllib.parse import unquote
 
-import yaml
-
-
 REPO_ROOT = Path(__file__).resolve().parents[2]
 RUNTIME_ROOT = REPO_ROOT / "zjskills"
 
@@ -60,14 +57,11 @@ class OpenSourcePackageTests(unittest.TestCase):
         for phrase in (
             "## 中文贡献指南",
             "## English Contribution Guide",
-            "Domain Pack",
             "python3 -m unittest",
             "禁止隐藏推广",
             "No hidden promotion",
         ):
             self.assertIn(phrase, text)
-        self.assertIn("domain-pack.schema.yaml", text)
-        self.assertNotIn("domain-pack.schema.json", text)
 
     def test_chinese_document_set_is_complete(self):
         required = {
@@ -78,13 +72,6 @@ class OpenSourcePackageTests(unittest.TestCase):
                 "## 如何继续",
                 "## 如何重新规划",
             ),
-            "docs/usage-guide.md": (
-                "# ZJSkills 完整使用手册",
-                "## 完整工作流",
-                "## 产物与结构化状态",
-                "## 证据与能力判断",
-                "## 异常与安全边界",
-            ),
             "docs/examples.md": (
                 "# ZJSkills 使用场景与提示词",
                 "## 场景一：零基础了解 AI 行业",
@@ -92,20 +79,11 @@ class OpenSourcePackageTests(unittest.TestCase):
                 "## 场景三：转岗 AI 产品经理",
                 "## 场景四：在当前工作中应用 AI",
             ),
-            "docs/domain-pack-guide.md": (
-                "# Domain Pack 扩展指南",
-                "## 数据契约",
-                "## 能力与依赖",
-                "## 项目原型与评分关卡",
-                "## 验证与提交",
-            ),
         }
         for path, phrases in required.items():
             text = read_text(path)
             for phrase in phrases:
                 self.assertIn(phrase, text, f"{path}: {phrase}")
-        for path in ("docs/usage-guide.md", "docs/domain-pack-guide.md"):
-            self.assertIn("--learner-dir", read_text(path), path)
 
     def test_english_document_set_is_complete(self):
         required = {
@@ -116,13 +94,6 @@ class OpenSourcePackageTests(unittest.TestCase):
                 "## How to continue",
                 "## How to replan",
             ),
-            "docs/usage-guide.en.md": (
-                "# ZJSkills Full Usage Guide",
-                "## Complete workflow",
-                "## Artifacts and structured state",
-                "## Evidence and capability judgment",
-                "## Failure and safety boundaries",
-            ),
             "docs/examples.en.md": (
                 "# ZJSkills Scenarios and Prompts",
                 "## Scenario 1: Explore the AI industry from zero",
@@ -130,20 +101,11 @@ class OpenSourcePackageTests(unittest.TestCase):
                 "## Scenario 3: Transition to AI Product Manager",
                 "## Scenario 4: Apply AI in current work",
             ),
-            "docs/domain-pack-guide.en.md": (
-                "# Domain Pack Extension Guide",
-                "## Data contract",
-                "## Competencies and dependencies",
-                "## Project archetypes and rubric gates",
-                "## Validation and contribution",
-            ),
         }
         for path, phrases in required.items():
             text = read_text(path)
             for phrase in phrases:
                 self.assertIn(phrase, text, f"{path}: {phrase}")
-        for path in ("docs/usage-guide.en.md", "docs/domain-pack-guide.en.md"):
-            self.assertIn("--learner-dir", read_text(path), path)
 
     def test_platform_installation_guides_cover_supported_hosts_and_boundaries(self):
         required = {
@@ -194,8 +156,8 @@ class OpenSourcePackageTests(unittest.TestCase):
             "README.en.md": ("Problems during learning", "I'm stuck", "problem decomposition"),
             "docs/getting-started.md": ("## 学习中遇到问题", "现在只做这一步"),
             "docs/getting-started.en.md": ("## When you get stuck", "Do only this now"),
-            "docs/usage-guide.md": ("## 学习陪跑与问题拆解", "goal_system"),
-            "docs/usage-guide.en.md": ("## Learning support and problem decomposition", "goal_system"),
+            "docs/usage-guide.md": ("## 学习陪跑与问题拆解",),
+            "docs/usage-guide.en.md": ("## Learning support and problem decomposition",),
             "docs/examples.md": ("## 场景五：学习中卡住", "401"),
             "docs/examples.en.md": ("## Scenario 5: Getting stuck while learning", "401"),
         }
@@ -203,48 +165,6 @@ class OpenSourcePackageTests(unittest.TestCase):
             text = read_text(path)
             for phrase in phrases:
                 self.assertIn(phrase, text, f"{path}: {phrase}")
-
-    def test_pressure_scenarios_cover_learning_support_and_plan_adjustment(self):
-        document = yaml.safe_load(read_text("tests/zjskills/scenarios.yaml"))
-        scenarios = {item["id"]: item for item in document["scenarios"]}
-        required_ids = {
-            "concept-confusion",
-            "theory-action-gap",
-            "tool-error-401",
-            "project-first-step",
-            "missed-week",
-            "capacity-drop",
-            "learning-goal-change",
-            "unknown-blocker",
-            "ambiguous-ai-entry",
-            "explicit-error-bypasses-menu",
-            "numeric-stuck-selection",
-            "unknown-selection",
-            "resume-without-state",
-            "beginner-hides-internals",
-            "professional-shows-state",
-        }
-        self.assertTrue(required_ids <= set(scenarios))
-        for scenario_id in required_ids:
-            self.assertGreaterEqual(
-                len(scenarios[scenario_id]["required_behaviors"]),
-                3,
-                scenario_id,
-            )
-        evaluation = read_text("tests/zjskills/v2-interaction-evaluation.md")
-        evaluated_ids = {
-            "ambiguous-ai-entry",
-            "explicit-error-bypasses-menu",
-            "numeric-stuck-selection",
-            "unknown-selection",
-            "resume-without-state",
-            "beginner-hides-internals",
-            "professional-shows-state",
-            "capacity-drop",
-            "learning-goal-change",
-        }
-        for scenario_id in evaluated_ids:
-            self.assertIn(f"| {scenario_id} | PASS |", evaluation)
 
     def test_v2_migration_commands_fail_closed_on_existing_paths(self):
         chinese = read_text("docs/platform-installation.md")
@@ -352,39 +272,11 @@ class OpenSourcePackageTests(unittest.TestCase):
             self.assertIn("learning-architect", text)
             self.assertIn("回滚" if path.endswith(".md") and not path.endswith(".en.md") else "rollback", text.lower())
 
-    def test_skill_metadata_covers_ai_exploration_and_transition(self):
-        skill = read_text("zjskills/SKILL.md")
-        for phrase in (
-            "AI industry exploration",
-            "AI learning-direction decisions",
-            "AI career-transition planning",
-            "personalized learning path",
-        ):
-            self.assertIn(phrase, skill)
-
     def test_skill_ui_uses_zjskills_technical_identifier(self):
         metadata = read_text("zjskills/agents/openai.yaml")
         self.assertIn('display_name: "ZJSkills"', metadata)
         self.assertIn("$zjskills", metadata)
         self.assertNotIn("$learning-architect", metadata)
-
-    def test_runtime_skill_is_brand_and_promotion_neutral(self):
-        forbidden = ("ZJSkills", "智建", "社群", "community link", "课程推广")
-        violations = []
-        allowed_brand_metadata = RUNTIME_ROOT / "agents" / "openai.yaml"
-        for path in RUNTIME_ROOT.rglob("*"):
-            if not path.is_file() or "__pycache__" in path.parts:
-                continue
-            if path.suffix.lower() not in {".md", ".yaml", ".yml", ".txt", ".py"}:
-                continue
-            text = path.read_text(encoding="utf-8", errors="ignore")
-            for phrase in forbidden:
-                if path == allowed_brand_metadata and phrase == "ZJSkills":
-                    continue
-                if phrase in text:
-                    violations.append(f"{path.relative_to(REPO_ROOT)}: {phrase}")
-        self.assertEqual(violations, [])
-
 
 if __name__ == "__main__":
     unittest.main()

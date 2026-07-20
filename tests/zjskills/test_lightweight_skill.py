@@ -1,0 +1,216 @@
+from pathlib import Path
+import re
+import subprocess
+import unittest
+
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+RUNTIME_ROOT = REPO_ROOT / "zjskills"
+
+EXPECTED_RUNTIME_FILES = {
+    "zjskills/SKILL.md",
+    "zjskills/agents/openai.yaml",
+    "zjskills/references/ai-career-map.md",
+    "zjskills/references/career-diagnosis.md",
+    "zjskills/references/learning-help.md",
+    "zjskills/references/learning-route.md",
+}
+
+
+def read_runtime(relative_path: str) -> str:
+    return (RUNTIME_ROOT / relative_path).read_text(encoding="utf-8")
+
+
+def tracked_runtime_files() -> set[str]:
+    result = subprocess.run(
+        ["git", "ls-files", "zjskills"],
+        cwd=REPO_ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return {line for line in result.stdout.splitlines() if line}
+
+
+class LightweightSkillTests(unittest.TestCase):
+    def assert_contract_phrase(self, text: str, phrase: str):
+        matching_lines = "\n".join(
+            line for line in text.splitlines() if phrase in line
+        )
+        self.assertIn(phrase, matching_lines, phrase)
+
+    def assert_phrases_in_order(self, text: str, phrases: tuple[str, ...]):
+        positions = []
+        for phrase in phrases:
+            self.assert_contract_phrase(text, phrase)
+            positions.append(text.index(phrase))
+        self.assertEqual(positions, sorted(positions), phrases)
+
+    def test_runtime_contains_only_the_six_approved_files(self):
+        self.assertEqual(tracked_runtime_files(), EXPECTED_RUNTIME_FILES)
+
+    def test_runtime_respects_size_budgets(self):
+        missing = sorted(
+            path for path in EXPECTED_RUNTIME_FILES if not (REPO_ROOT / path).is_file()
+        )
+        self.assertEqual(missing, [])
+        skill_lines = len(read_runtime("SKILL.md").splitlines())
+        markdown_lines = sum(
+            len((REPO_ROOT / path).read_text(encoding="utf-8").splitlines())
+            for path in EXPECTED_RUNTIME_FILES
+            if path.endswith(".md")
+        )
+        self.assertLessEqual(skill_lines, 180)
+        self.assertLessEqual(markdown_lines, 800)
+
+    def test_skill_frontmatter_description_covers_all_three_entry_needs(self):
+        skill = read_runtime("SKILL.md")
+        frontmatter = skill.split("---", 2)[1].lower()
+        self.assertIn("name: zjskills", frontmatter)
+        for trigger in ("ai career direction", "learning route", "getting unstuck"):
+            self.assertIn(trigger, frontmatter, trigger)
+
+    def test_skill_defines_exactly_three_modes(self):
+        skill = read_runtime("SKILL.md")
+        self.assert_contract_phrase(skill, "## Choose One Mode")
+        mode_section = skill.split("## Choose One Mode", 1)[1].split("\n## ", 1)[0]
+        modes = re.findall(r"^\d+\.\s+(.+?)\s*$", mode_section, flags=re.MULTILINE)
+        self.assertEqual(
+            [mode.lower() for mode in modes],
+            ["career diagnosis", "learning route", "learning help"],
+        )
+
+    def test_skill_uses_context_first_entry_and_zero_or_one_question(self):
+        skill = read_runtime("SKILL.md")
+        for phrase in (
+            "$zjskills",
+            "/zjskills",
+            "Read the current conversation first.",
+            "Reuse facts, goals, constraints, prior conclusions, and feedback already supplied.",
+            "If evidence is sufficient, work immediately.",
+            "If one missing fact could change the judgment, ask only that one question.",
+        ):
+            self.assert_contract_phrase(skill, phrase)
+
+    def test_skill_conditionally_loads_all_four_references(self):
+        skill = read_runtime("SKILL.md")
+        self.assert_contract_phrase(skill, "## Load Only What Is Needed")
+        for reference in (
+            "references/career-diagnosis.md",
+            "references/learning-route.md",
+            "references/learning-help.md",
+            "references/ai-career-map.md",
+        ):
+            self.assert_contract_phrase(skill, reference)
+            self.assertRegex(
+                skill,
+                rf"(?m)^\|[^|]+\|[^|]*`{re.escape(reference)}`[^|]*\|$",
+                reference,
+            )
+
+    def test_career_diagnosis_has_the_compact_output_contract(self):
+        self.assertTrue(
+            (RUNTIME_ROOT / "references/career-diagnosis.md").is_file()
+        )
+        diagnosis = read_runtime("references/career-diagnosis.md")
+        self.assert_phrases_in_order(
+            diagnosis,
+            (
+                "Your current situation",
+                "The real problem to solve",
+                "My judgment",
+                "Evidence for the judgment",
+                "What not to do yet",
+                "One minimum validation action",
+                "How to interpret the result",
+            ),
+        )
+
+    def test_learning_route_has_the_three_stage_output_contract(self):
+        self.assertTrue((RUNTIME_ROOT / "references/learning-route.md").is_file())
+        route = read_runtime("references/learning-route.md")
+        self.assert_phrases_in_order(
+            route,
+            (
+                "Target",
+                "Current starting point",
+                "Stage 1: capability and deliverable",
+                "Stage 2: capability and deliverable",
+                "Stage 3: target-level deliverable",
+                "Evidence project for each stage",
+                "Only this week's action",
+            ),
+        )
+
+    def test_learning_help_has_one_action_and_fallback_contract(self):
+        self.assertTrue((RUNTIME_ROOT / "references/learning-help.md").is_file())
+        help_text = read_runtime("references/learning-help.md")
+        self.assert_phrases_in_order(
+            help_text,
+            (
+                "Where you are stuck",
+                "Most likely cause",
+                "Do this one action first",
+                "Observable success signal",
+                "If it fails, check this next",
+                "Route impact",
+            ),
+        )
+
+    def test_ai_career_map_covers_all_directions_and_operations_branches(self):
+        self.assertTrue((RUNTIME_ROOT / "references/ai-career-map.md").is_file())
+        career_map = read_runtime("references/ai-career-map.md")
+        for phrase in (
+            "AI Agent Development",
+            "Vibe Coding / AI Application Building",
+            "AI Product Management",
+            "AI Operations: Content/Growth",
+            "AI Operations: Business Efficiency",
+            "AI Tools and Workplace Application",
+        ):
+            self.assert_contract_phrase(career_map, phrase)
+
+    def test_beginner_facing_runtime_omits_legacy_system_terms(self):
+        beginner_paths = (
+            "SKILL.md",
+            "references/career-diagnosis.md",
+            "references/learning-route.md",
+            "references/learning-help.md",
+        )
+        missing = sorted(
+            path for path in beginner_paths if not (RUNTIME_ROOT / path).is_file()
+        )
+        self.assertEqual(missing, [])
+        beginner_instructions = "\n".join(
+            read_runtime(path) for path in beginner_paths
+        ).lower()
+        instruction_tokens = set(re.findall(r"[a-z0-9.-]+", beginner_instructions))
+        for phrase in ("11-stage", "system-state.yaml", "schema", "gate"):
+            self.assertNotIn(phrase, instruction_tokens, phrase)
+
+    def test_runtime_has_no_referral_or_conversion_instructions(self):
+        runtime = "\n".join(
+            (REPO_ROOT / path).read_text(encoding="utf-8")
+            for path in sorted(EXPECTED_RUNTIME_FILES)
+            if path.endswith((".md", ".yaml"))
+            and (REPO_ROOT / path).exists()
+        ).lower()
+        forbidden = (
+            "联系智建",
+            "答疑群",
+            "加入社群",
+            "加微信",
+            "购买课程",
+            "转化用户",
+            "人工转介",
+            "contact zhijian",
+            "join the q&a group",
+            "add wechat",
+            "lead conversion",
+        )
+        for phrase in forbidden:
+            self.assertNotIn(phrase, runtime, phrase)
+
+
+if __name__ == "__main__":
+    unittest.main()
