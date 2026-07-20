@@ -396,4 +396,3 @@ The redesign is complete when:
 - runtime stays commercially neutral;
 - bilingual public documentation keeps the transparent 智建 support note;
 - structural tests and ten forward evaluations pass.
-
