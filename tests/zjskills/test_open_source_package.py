@@ -58,6 +58,13 @@ def read_text(path: str) -> str:
 
 
 class OpenSourcePackageTests(unittest.TestCase):
+    def assert_phrases_in_order(self, text: str, phrases: tuple[str, ...], path: str):
+        cursor = -1
+        for phrase in phrases:
+            location = text.find(phrase, cursor + 1)
+            self.assertNotEqual(location, -1, f"{path}: {phrase}")
+            cursor = location
+
     def level_two_section(self, text: str, heading: str) -> str:
         marker = f"## {heading}"
         self.assertIn(marker, text)
@@ -202,6 +209,69 @@ class OpenSourcePackageTests(unittest.TestCase):
             for phrase in phrases:
                 self.assertIn(phrase, text, f"{path}: {phrase}")
 
+    def test_bilingual_guides_present_the_seven_diagnosis_sections_in_runtime_order(self):
+        required = {
+            "docs/getting-started.md": (
+                "当前情况",
+                "可迁移职业资产",
+                "真正要解决的问题",
+                "机会假设",
+                "当前判断与证据",
+                "一个最小验证行动",
+                "结果如何改变选择",
+            ),
+            "docs/getting-started.en.md": (
+                "current situation",
+                "transferable career assets",
+                "real problem to solve",
+                "opportunity hypotheses",
+                "judgment and evidence",
+                "one minimum validation action",
+                "how the result changes the decision",
+            ),
+            "docs/usage-guide.md": (
+                "当前情况",
+                "可迁移职业资产",
+                "真正要解决的问题",
+                "机会假设",
+                "当前判断与证据",
+                "一个最小验证行动",
+                "结果如何改变选择",
+            ),
+            "docs/usage-guide.en.md": (
+                "current situation",
+                "transferable career assets",
+                "real problem to solve",
+                "opportunity hypotheses",
+                "judgment and evidence",
+                "one minimum validation action",
+                "how the result changes the decision",
+            ),
+        }
+        sections = {
+            "docs/getting-started.md": "一页职业诊断会包含什么",
+            "docs/getting-started.en.md": "What a one-page career diagnosis contains",
+            "docs/usage-guide.md": "三种模式如何选择",
+            "docs/usage-guide.en.md": "How the three modes are selected",
+        }
+        for path, phrases in required.items():
+            section = self.level_two_section(read_text(path), sections[path])
+            self.assert_phrases_in_order(section, phrases, path)
+            self.assertNotIn("现在先不要做什么", section, path)
+            self.assertNotIn("what not to do yet", section, path)
+
+    def test_public_release_introductions_use_exact_3_1_0(self):
+        required = {
+            "README.md": "ZJSkills 3.1.0 是一个轻量、AI 优先的职业诊断 Skill。",
+            "README.en.md": "ZJSkills 3.1.0 is a lightweight, AI-first career diagnosis Skill.",
+            "docs/usage-guide.md": "ZJSkills 3.1.0 是 AI 优先的轻量职业诊断 Skill。",
+            "docs/usage-guide.en.md": "ZJSkills 3.1.0 is a lightweight, AI-first career diagnosis Skill.",
+            "docs/examples.md": "这些示例展示 3.1.0 的真实入口。",
+            "docs/examples.en.md": "These examples show the real 3.1.0 entry points.",
+        }
+        for path, phrase in required.items():
+            self.assertIn(phrase, read_text(path), f"{path}: {phrase}")
+
     def test_bilingual_guides_cover_assets_closure_and_market_evidence(self):
         required = {
             "docs/usage-guide.md": (
@@ -228,7 +298,7 @@ class OpenSourcePackageTests(unittest.TestCase):
             for phrase in phrases:
                 self.assertIn(phrase, text, f"{path}: {phrase}")
 
-    def test_usage_pair_covers_the_3_0_contract(self):
+    def test_usage_pair_covers_the_3_1_0_contract(self):
         required = {
             "docs/usage-guide.md": (
                 "# ZJSkills 完整使用手册",

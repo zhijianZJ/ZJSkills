@@ -2,7 +2,7 @@
 
 [简体中文](examples.md)
 
-These examples show the real 3.1 entry points. Copy a prompt and replace bracketed text with your observed result. A good response stays compact, reuses existing context, selects one mode, and ends with one action.
+These examples show the real 3.1.0 entry points. Copy a prompt and replace bracketed text with your observed result. A good response stays compact, reuses existing context, selects one mode, and ends with one action.
 
 ## Scenario 1: A vague AI transition
 

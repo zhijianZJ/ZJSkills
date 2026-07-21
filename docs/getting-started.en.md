@@ -34,13 +34,13 @@ My job title is [title]. The problem I repeatedly solved was [problem], and the 
 
 The default diagnosis stays within seven compact sections:
 
-1. your current situation;
-2. the real problem to solve;
-3. the current judgment;
-4. evidence for the judgment, separating known facts, inference, and uncertainty;
-5. what not to do yet;
+1. current situation;
+2. transferable career assets;
+3. real problem to solve;
+4. opportunity hypotheses;
+5. judgment and evidence;
 6. one minimum validation action;
-7. how to interpret the result.
+7. how the result changes the decision.
 
 “Stronger fit,” “worth testing with risk,” “do not invest heavily yet,” and “insufficient evidence” are provisional judgments, not capability certificates. They do not guarantee an offer, transition, or income. Interest, education, content exposure, and confidence are context, not standalone proof.
 

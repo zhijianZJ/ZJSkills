@@ -2,7 +2,7 @@
 
 [简体中文](usage-guide.md)
 
-ZJSkills 3.1 is a lightweight, AI-first career diagnosis Skill. It reads the current conversation, selects one mode, returns a compact result, and ends with the single most useful action. Users do not need internal terminology or a fixed intake sequence.
+ZJSkills 3.1.0 is a lightweight, AI-first career diagnosis Skill. It reads the current conversation, selects one mode, returns a compact result, and ends with the single most useful action. Users do not need internal terminology or a fixed intake sequence.
 
 ## How the three modes are selected
 
@@ -16,7 +16,7 @@ Each request uses exactly one mode:
 
 Reuse goals, experience, constraints, conclusions, and feedback already in the conversation. Ask no question when the evidence supports a useful next step. Ask only one decisive question when one missing fact could change the judgment or action. Do not launch a fixed questionnaire or predeclare a compulsory chain of later steps.
 
-Career diagnosis keeps seven visible sections: current situation, real problem to solve, current judgment, evidence for the judgment, what not to do yet, one minimum validation action, and how to interpret the result. It is not a long report by default; each section keeps only what can change the judgment or action.
+Career diagnosis keeps seven visible sections: current situation, transferable career assets, real problem to solve, opportunity hypotheses, judgment and evidence, one minimum validation action, and how the result changes the decision. It is not a long report by default; each section keeps only what can change the judgment or action.
 
 ## Evidence categories and judgment boundaries
 

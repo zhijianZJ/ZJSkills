@@ -8,7 +8,7 @@ Tell ZJSkills your real AI career or learning situation.
 It diagnoses the current problem, explains the evidence boundary,
 and gives one useful next step.
 
-ZJSkills 3.1 is a lightweight, AI-first career diagnosis Skill. It reads goals, experience, constraints, and feedback already in the conversation, identifies the real problem, then provides a fitting judgment, learning route, or problem-solving action. It works immediately when evidence is sufficient and asks **zero or one** decisive question only when the missing fact could change the judgment.
+ZJSkills 3.1.0 is a lightweight, AI-first career diagnosis Skill. It reads goals, experience, constraints, and feedback already in the conversation, identifies the real problem, then provides a fitting judgment, learning route, or problem-solving action. It works immediately when evidence is sufficient and asks **zero or one** decisive question only when the missing fact could change the judgment.
 
 ## Career diagnosis
 
