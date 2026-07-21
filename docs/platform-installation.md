@@ -2,7 +2,7 @@
 
 [English](platform-installation.en.md)
 
-本文适用于 ZJSkills 3.0.0。技术目录和 Skill 名称是 `zjskills`，公开名称是 `ZJSkills`。不同产品的接入能力不相同：原生 Skill 由宿主发现并按需加载 `SKILL.md` 及引用文件；手动文件/上下文接入只在当前会话中把这些文件作为指令和参考，不能假设自动触发、完整加载或跨会话持续。
+本文适用于 ZJSkills 3.1.0。技术目录和 Skill 名称是 `zjskills`，公开名称是 `ZJSkills`。不同产品的接入能力不相同：原生 Skill 由宿主发现并按需加载 `SKILL.md` 及引用文件；手动文件/上下文接入只在当前会话中把这些文件作为指令和参考，不能假设自动触发、完整加载或跨会话持续。
 
 ## 兼容性矩阵
 
@@ -16,7 +16,7 @@
 
 ## 安装前检查
 
-获取仓库并确认 3.0 运行目录只有 `SKILL.md`、一个界面文件和四个引用文件：
+获取仓库并确认 3.1.0 运行目录仍然只有 `SKILL.md`、一个界面文件和四个引用文件，共六个运行时文件：
 
 ```bash
 git clone https://github.com/zhijianZJ/ZJSkills.git
@@ -145,16 +145,16 @@ test "$(find zjskills/references -maxdepth 1 -type f -name '*.md' | wc -l | tr -
 
 正确结果应返回职业诊断，区分已知事实、推断与不确定性，并只给一个验证行动。再分别测试“方向已明确，请生成最多三阶段路线”和“我卡住了：[现象]”，确认三种模式都能工作。
 
-## 从 2.x 迁移到 3.0.0
+## 从 2.x 或 3.0.x 迁移到 3.1.0
 
-2.x 与 3.0 使用相同技术目录 `zjskills`，不能把新文件直接合并进旧安装目录。先备份已安装 Skill，再完整替换：
+2.x、3.0.x 与 3.1.0 使用相同技术目录 `zjskills`，不能把新文件直接合并进旧安装目录。先备份已安装 Skill，再完整替换；3.1.0 的运行时仍是相同六文件结构：
 
 ```bash
 (
   set -e
   skills_root="$HOME/.agents/skills"
   installed="$skills_root/zjskills"
-  backup="$skills_root/zjskills.backup-2.x"
+  backup="$skills_root/zjskills.backup-before-3.1"
   replacement="$PWD/zjskills"
   test -f "$installed/SKILL.md"
   test -f "$replacement/SKILL.md"
@@ -170,11 +170,11 @@ test "$(find zjskills/references -maxdepth 1 -type f -name '*.md' | wc -l | tr -
 )
 ```
 
-Claude Code 只需把根目录改为 `$HOME/.claude/skills`。Windows PowerShell 中，先确认 `$HOME\.agents\skills\zjskills.backup-2.x` 不存在，再把已安装目录移动为该备份名，复制仓库中的 `zjskills`，最后检查 `SKILL.md` 与四个引用文件。
+Claude Code 只需把根目录改为 `$HOME/.claude/skills`。Windows PowerShell 中，先确认 `$HOME\.agents\skills\zjskills.backup-before-3.1` 不存在，再把已安装目录移动为该备份名，复制仓库中的 `zjskills`，最后检查 `SKILL.md` 与四个引用文件。
 
-始终**保留用户自己创建的学习文件**；它们不属于安装目录升级范围。3.0 不默认维护旧 YAML 工作区。用户主动提供时，把它当作来源材料读取，并可选择把仍然有效的诊断、目标、路线、当前行动和更新记录汇总为一份 Markdown 文件；不要删除或覆盖原文件。
+始终**保留用户自己创建的学习文件**；它们不属于安装目录升级范围。3.1.0 不默认维护旧 YAML 工作区。用户主动提供时，把它当作来源材料读取，并可选择把仍然有效的诊断、目标、路线、当前行动和更新记录汇总为一份 Markdown 文件；不要删除或覆盖原文件。
 
-迁移验收通过前保留备份。需要回滚时，先移走 3.0 安装目录，再把 `zjskills.backup-2.x` 恢复为 `zjskills`，不要用复制覆盖可能存在的本地修改。
+迁移验收通过前保留备份。需要回滚时，先移走 3.1.0 安装目录，再把 `zjskills.backup-before-3.1` 恢复为 `zjskills`，不要用复制覆盖可能存在的本地修改。
 
 ## 公开支持说明
 
