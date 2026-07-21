@@ -2,7 +2,7 @@
 
 [简体中文](usage-guide.md)
 
-ZJSkills 3.0 is a lightweight, AI-first career diagnosis Skill. It reads the current conversation, selects one mode, returns a compact result, and ends with the single most useful action. Users do not need internal terminology or a fixed intake sequence.
+ZJSkills 3.1 is a lightweight, AI-first career diagnosis Skill. It reads the current conversation, selects one mode, returns a compact result, and ends with the single most useful action. Users do not need internal terminology or a fixed intake sequence.
 
 ## How the three modes are selected
 
@@ -16,6 +16,8 @@ Each request uses exactly one mode:
 
 Reuse goals, experience, constraints, conclusions, and feedback already in the conversation. Ask no question when the evidence supports a useful next step. Ask only one decisive question when one missing fact could change the judgment or action. Do not launch a fixed questionnaire or predeclare a compulsory chain of later steps.
 
+Career diagnosis keeps seven visible sections: current situation, real problem to solve, current judgment, evidence for the judgment, what not to do yet, one minimum validation action, and how to interpret the result. It is not a long report by default; each section keeps only what can change the judgment or action.
+
 ## Evidence categories and judgment boundaries
 
 Separate three layers in every important judgment:
@@ -27,6 +29,16 @@ Separate three layers in every important judgment:
 Career direction uses five evidence dimensions: the actual desired result; current work and project experience; time, budget, equipment, language, and learning conditions; observed response to coding, product, content, process, or workplace tasks; and the result of a minimum experience task.
 
 Interest, confidence, education, certificates, and content exposure may inform a hypothesis but cannot independently prove capability, independent delivery, or job readiness. A diagnosis uses one of four levels: stronger fit, worth testing with a named risk, do not invest heavily yet, or insufficient evidence—validate first.
+
+## Transferable career assets
+
+Career diagnosis does not map a job title directly to a new career. It translates experience into three inspectable categories:
+
+- **Demonstrated assets:** capabilities repeatedly shown in real work and supported by results, deliverables, feedback, or reproducible records;
+- **Transfer hypotheses:** existing assets that may create value in the target direction but still need testing with a new work object, tool, or constraint;
+- **Unverified boundaries:** areas with no evidence, conflicting evidence, or enough decision impact to require validation.
+
+Start with the problems the person repeatedly solved, who benefited, and the observed results, then describe the new tasks where that asset may transfer. A title, tenure, or certificate supplies context but does not automatically become a demonstrated asset. The result is an opportunity hypothesis with a test, not a guarantee of fit.
 
 ## Five visible AI directions
 
@@ -50,6 +62,17 @@ When evidence is weak or two directions remain plausible, use the smallest real 
 6. **AI Tools:** redo one real work deliverable and compare before/after quality or time.
 
 The evidence is the observed result: what worked, what failed, what changed, and what the user can explain. One task is not a lifelong fit verdict, but it is more useful than a self-rating.
+
+## Consultation closure and four stage decisions
+
+When a user returns with a minimum-experience result, remain in Career diagnosis and reuse the previous target, assets, risks, and unverified boundaries. Do not repeat questions already answered. Use the new result to make exactly one current stage decision:
+
+1. **Ready to enter a route:** direction and starting point have enough evidence to hand off to a route of at most three stages;
+2. **Still needs comparison:** two directions or work objects remain unresolved, so give one comparison action that can change the choice;
+3. **Build foundations first:** a prerequisite is missing, so give one bounded foundation action and observe the result;
+4. **Apply in the current role first:** evidence or conditions for a direct move remain weak, so create a real deliverable and feedback loop in the current role.
+
+Only the first decision hands off to Learning route. The other three continue evidence collection with one observable action. Do not turn one success or failure into a permanent conclusion or an automatic long-term route.
 
 ## A learning route of at most three stages
 
@@ -84,6 +107,12 @@ For an error, use the exact message, reproduction steps, input, output, and envi
 First decide whether the material is relevant to the current target. Classify relevant content as fact, opinion, example, inference, or unknown. Extract only what the active action needs, explain the key dependency in beginner language, and select one retrieval, practice, or transfer action.
 
 If a page, file, or complete excerpt was not actually available, say so rather than fabricating access. A summary is learning activity; it is not automatic proof of understanding, transfer, or independent capability.
+
+## Evidence boundary for current market information
+
+Treat “current salary,” “hiring now,” “hiring window,” job counts, or trends as current market facts only when the answer can name the **source, publication date, applicable region, and sample or method limitations**. For a user-supplied screenshot, job page, or report, separate the source observation, sample scope, and inference; one sample cannot represent the whole market.
+
+When those conditions are missing, explicitly withhold a specific salary, window, or trend claim instead of filling the gap with a guess. Structural guidance is still useful: break down common work objects, define fields to collect from local job postings, or design a small job-sample check. If the current fact would change the decision, ask only for the smallest reliable source.
 
 ## Boundary for non-AI requests
 

@@ -2,7 +2,7 @@
 
 [简体中文](platform-installation.md)
 
-This guide applies to ZJSkills 3.0.0. The technical directory and Skill name are `zjskills`; the public display name is `ZJSkills`. Hosts have different integration capabilities. A Native Skill is discovered by the host, which loads `SKILL.md` and references when needed. Manual file/context use treats the files as instructions and reference material in the current conversation; it does not imply automatic triggering, complete loading, or cross-session continuity.
+This guide applies to ZJSkills 3.1.0. The technical directory and Skill name are `zjskills`; the public display name is `ZJSkills`. Hosts have different integration capabilities. A Native Skill is discovered by the host, which loads `SKILL.md` and references when needed. Manual file/context use treats the files as instructions and reference material in the current conversation; it does not imply automatic triggering, complete loading, or cross-session continuity.
 
 ## Compatibility matrix
 
@@ -16,7 +16,7 @@ This guide applies to ZJSkills 3.0.0. The technical directory and Skill name are
 
 ## Before installation
 
-Get the repository and confirm that the 3.0 runtime contains `SKILL.md`, one interface file, and four reference files:
+Get the repository and confirm that the 3.1.0 runtime still contains only `SKILL.md`, one interface file, and four reference files: six runtime files in total.
 
 ```bash
 git clone https://github.com/zhijianZJ/ZJSkills.git
@@ -145,16 +145,16 @@ I want to move into AI but cannot choose between Agent and Vibe Coding. I know a
 
 A correct result returns a career diagnosis, separates known facts, inference, and uncertainty, and gives one validation action. Then test “The direction is clear; generate a route of at most three stages” and “I'm stuck: [observed result]” to confirm all three modes.
 
-## Migrate from 2.x to 3.0.0
+## Migrate from 2.x or 3.0.x to 3.1.0
 
-Both versions use the technical directory `zjskills`, so do not merge the new files into an old installation. Back up the installed Skill, then replace it completely:
+Versions 2.x, 3.0.x, and 3.1.0 use the same technical directory `zjskills`, so do not merge the new files into an old installation. Back up the installed Skill, then replace it completely. The 3.1.0 runtime keeps the same six-file shape:
 
 ```bash
 (
   set -e
   skills_root="$HOME/.agents/skills"
   installed="$skills_root/zjskills"
-  backup="$skills_root/zjskills.backup-2.x"
+  backup="$skills_root/zjskills.backup-before-3.1"
   replacement="$PWD/zjskills"
   test -f "$installed/SKILL.md"
   test -f "$replacement/SKILL.md"
@@ -170,11 +170,11 @@ Both versions use the technical directory `zjskills`, so do not merge the new fi
 )
 ```
 
-For Claude Code, change the root to `$HOME/.claude/skills`. In Windows PowerShell, first confirm that `$HOME\.agents\skills\zjskills.backup-2.x` does not exist, move the installed directory to that backup name, copy the repository `zjskills` directory, and check `SKILL.md` plus the four reference files.
+For Claude Code, change the root to `$HOME/.claude/skills`. In Windows PowerShell, first confirm that `$HOME\.agents\skills\zjskills.backup-before-3.1` does not exist, move the installed directory to that backup name, copy the repository `zjskills` directory, and check `SKILL.md` plus the four reference files.
 
-Always **keep user-created learning files**; they are outside the installed Skill upgrade. Version 3.0 does not maintain an old YAML workspace by default. When a user supplies one, read it as source material and optionally summarize still-valid diagnosis, target, route, current action, and update history into one Markdown file. Never delete or overwrite the source.
+Always **keep user-created learning files**; they are outside the installed Skill upgrade. Version 3.1.0 does not maintain an old YAML workspace by default. When a user supplies one, read it as source material and optionally summarize still-valid diagnosis, target, route, current action, and update history into one Markdown file. Never delete or overwrite the source.
 
-Keep the backup until acceptance passes. To roll back, move the 3.0 installation away, then restore `zjskills.backup-2.x` as `zjskills`. Do not copy over local modifications.
+Keep the backup until acceptance passes. To roll back, move the 3.1.0 installation away, then restore `zjskills.backup-before-3.1` as `zjskills`. Do not copy over local modifications.
 
 ## Public support note
 

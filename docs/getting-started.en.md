@@ -24,6 +24,12 @@ I want to move into AI, but I do not know whether Agent, Vibe Coding, AI Product
 Use the experience I have already described in this conversation and diagnose first. Ask one question only if one missing fact could change the judgment.
 ```
 
+If a job title is too broad, start with the problem you repeatedly solved and add an observable result:
+
+```text
+My job title is [title]. The problem I repeatedly solved was [problem], and the result was [result]. Separate demonstrated assets, transfer hypotheses, and unverified boundaries.
+```
+
 ## What a one-page career diagnosis contains
 
 The default diagnosis stays within seven compact sections:
@@ -37,6 +43,14 @@ The default diagnosis stays within seven compact sections:
 7. how to interpret the result.
 
 “Stronger fit,” “worth testing with risk,” “do not invest heavily yet,” and “insufficient evidence” are provisional judgments, not capability certificates. They do not guarantee an offer, transition, or income. Interest, education, content exposure, and confidence are context, not standalone proof.
+
+After completing the minimum experience task in section 6, return to the same conversation with the result:
+
+```text
+I completed the minimum experience task. The observed result was [result]. Reuse the previous diagnosis and decide whether I am ready to enter a route, still need comparison, should build foundations first, or should apply this in my current role first. Give only one next step.
+```
+
+This response makes one current stage decision. Only “ready to enter a route” hands off to Learning route. The other decisions remain in Career diagnosis and use one action to close the most important evidence or foundation gap.
 
 ## Reply “Continue”: expand a learning route
 

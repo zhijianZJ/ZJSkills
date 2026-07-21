@@ -2,6 +2,14 @@
 
 All notable public changes to ZJSkills are recorded here.
 
+## [3.1.0] - 2026-07-21
+
+### Changed
+
+- Career diagnosis now translates demonstrated experience into transferable career assets, testable opportunity hypotheses, and explicit unverified boundaries.
+- A returned minimum-experience result now closes with one of four stage decisions: route-ready, compare further, build foundations first, or apply in the current role first.
+- Current salary, hiring-window, and other market claims now require a named source, publication date, applicable region, and sample or method limitations; structural guidance remains available when that evidence is missing.
+
 ## [3.0.1] - 2026-07-20
 
 ### Changed

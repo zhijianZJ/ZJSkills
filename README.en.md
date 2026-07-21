@@ -2,17 +2,17 @@
 
 [简体中文](README.md)
 
-**Version [3.0.1](VERSION) · MIT**
+**Version [3.1.0](VERSION) · MIT**
 
 Tell ZJSkills your real AI career or learning situation.
 It diagnoses the current problem, explains the evidence boundary,
 and gives one useful next step.
 
-ZJSkills 3.0 is a lightweight, AI-first career diagnosis Skill. It reads goals, experience, constraints, and feedback already in the conversation, identifies the real problem, then provides a fitting judgment, learning route, or problem-solving action. It works immediately when evidence is sufficient and asks **zero or one** decisive question only when the missing fact could change the judgment.
+ZJSkills 3.1 is a lightweight, AI-first career diagnosis Skill. It reads goals, experience, constraints, and feedback already in the conversation, identifies the real problem, then provides a fitting judgment, learning route, or problem-solving action. It works immediately when evidence is sufficient and asks **zero or one** decisive question only when the missing fact could change the judgment.
 
 ## Career diagnosis
 
-Use this mode when you do not know which direction to take, need to compare options, doubt your fit, or need to decide whether investing now is justified. The diagnosis separates known facts, evidence-backed inference, and uncertainty. It gives a minimum experience task instead of treating interest, education, certificates, or confidence as proof of capability.
+Use this mode when you do not know which direction to take, need to compare options, doubt your fit, or need to decide whether investing now is justified. The diagnosis translates demonstrated experience into transferable career assets and testable opportunity hypotheses, while naming what remains unverified. It gives a minimum experience task instead of treating interest, education, certificates, or confidence as proof of capability. When you return with the result, it reuses the diagnosis and makes a stage decision; only “ready to enter a route” hands off to Learning route.
 
 The five visible directions are:
 
@@ -66,7 +66,7 @@ ZJSkills supports Native Skill installation on Codex and Claude Code. On Tencent
 
 - [Getting Started](docs/getting-started.en.md)
 - [Full Usage Guide](docs/usage-guide.en.md)
-- [Nine Scenarios and Prompts](docs/examples.en.md)
+- [Twelve Scenarios and Prompts](docs/examples.en.md)
 - [Multi-platform Installation and Usage](docs/platform-installation.en.md)
 - [Contribution Guide](CONTRIBUTING.md)
 

@@ -65,13 +65,13 @@ class OpenSourcePackageTests(unittest.TestCase):
         next_heading = re.search(r"(?m)^##\s+", remainder)
         return remainder[: next_heading.start()] if next_heading else remainder
 
-    def test_readme_pair_and_version_surface_3_0_1(self):
+    def test_readme_pair_and_version_surface_3_1_0(self):
         self.assertFalse((REPO_ROOT / "README.zh-CN.md").exists())
         chinese = read_text("README.md")
         english = read_text("README.en.md")
-        self.assertEqual(read_text("VERSION").strip(), "3.0.1")
+        self.assertEqual(read_text("VERSION").strip(), "3.1.0")
         for text in (chinese, english):
-            self.assertIn("3.0.1", text)
+            self.assertIn("3.1.0", text)
             self.assertIn("MIT", text)
             self.assertIn("ZJSkills", text)
             self.assertIn("https://github.com/zhijianZJ/ZJSkills.git", text)
@@ -202,6 +202,32 @@ class OpenSourcePackageTests(unittest.TestCase):
             for phrase in phrases:
                 self.assertIn(phrase, text, f"{path}: {phrase}")
 
+    def test_bilingual_guides_cover_assets_closure_and_market_evidence(self):
+        required = {
+            "docs/usage-guide.md": (
+                "## 可迁移职业资产",
+                "## 咨询闭环与四种阶段选择",
+                "## 当前市场信息的证据门槛",
+            ),
+            "docs/usage-guide.en.md": (
+                "## Transferable career assets",
+                "## Consultation closure and four stage decisions",
+                "## Evidence boundary for current market information",
+            ),
+            "docs/getting-started.md": (
+                "你过去反复解决过什么问题",
+                "我已经完成最小体验任务",
+            ),
+            "docs/getting-started.en.md": (
+                "the problem you repeatedly solved",
+                "I completed the minimum experience task",
+            ),
+        }
+        for path, phrases in required.items():
+            text = read_text(path)
+            for phrase in phrases:
+                self.assertIn(phrase, text, f"{path}: {phrase}")
+
     def test_usage_pair_covers_the_3_0_contract(self):
         required = {
             "docs/usage-guide.md": (
@@ -236,7 +262,7 @@ class OpenSourcePackageTests(unittest.TestCase):
             for phrase in phrases:
                 self.assertIn(phrase, text, f"{path}: {phrase}")
 
-    def test_examples_pair_covers_nine_forward_scenarios(self):
+    def test_examples_pair_covers_twelve_forward_scenarios(self):
         required = {
             "docs/examples.md": (
                 "## 场景一：模糊的 AI 转型",
@@ -248,6 +274,9 @@ class OpenSourcePackageTests(unittest.TestCase):
                 "## 场景七：一周没完成",
                 "## 场景八：目标变了",
                 "## 场景九：非 AI 请求",
+                "## 场景十：职位名称太宽",
+                "## 场景十一：带着体验结果回来",
+                "## 场景十二：询问当前薪资与招聘窗口",
             ),
             "docs/examples.en.md": (
                 "## Scenario 1: A vague AI transition",
@@ -259,6 +288,9 @@ class OpenSourcePackageTests(unittest.TestCase):
                 "## Scenario 7: A missed week",
                 "## Scenario 8: A changed goal",
                 "## Scenario 9: A non-AI request",
+                "## Scenario 10: A job title is too broad",
+                "## Scenario 11: Returning with an experience result",
+                "## Scenario 12: Asking about current salary and hiring windows",
             ),
         }
         for path, phrases in required.items():
@@ -288,7 +320,7 @@ class OpenSourcePackageTests(unittest.TestCase):
             for phrase in forbidden:
                 self.assertNotIn(phrase.lower(), text, f"{path}: {phrase}")
 
-    def test_platform_guides_cover_five_host_categories_and_3_0_verification(self):
+    def test_platform_guides_cover_five_host_categories_and_3_1_verification(self):
         required = {
             "docs/platform-installation.md": (
                 "# ZJSkills 多平台安装与使用",
@@ -305,7 +337,8 @@ class OpenSourcePackageTests(unittest.TestCase):
                 "$zjskills",
                 "/zjskills",
                 "返回职业诊断",
-                "## 从 2.x 迁移到 3.0.0",
+                "3.1.0",
+                "## 从 2.x 或 3.0.x 迁移到 3.1.0",
                 "保留用户自己创建的学习文件",
                 "旧 YAML 工作区",
                 "Markdown",
@@ -325,7 +358,8 @@ class OpenSourcePackageTests(unittest.TestCase):
                 "$zjskills",
                 "/zjskills",
                 "returns a career diagnosis",
-                "## Migrate from 2.x to 3.0.0",
+                "3.1.0",
+                "## Migrate from 2.x or 3.0.x to 3.1.0",
                 "keep user-created learning files",
                 "old YAML workspace",
                 "Markdown",

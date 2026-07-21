@@ -2,7 +2,7 @@
 
 [简体中文](examples.md)
 
-These examples show the real 3.0 entry points. Copy a prompt and replace bracketed text with your observed result. A good response stays compact, reuses existing context, selects one mode, and ends with one action.
+These examples show the real 3.1 entry points. Copy a prompt and replace bracketed text with your observed result. A good response stays compact, reuses existing context, selects one mode, and ends with one action.
 
 ## Scenario 1: A vague AI transition
 
@@ -75,5 +75,29 @@ I want to become a registered dietitian within six months. Give me authoritative
 ```
 
 Say that the target is mainly outside AI and that the Skill has not established local licensing, examination, or market evidence. It can confirm the region, organize official material the user supplies, and clarify one validation step, but it must not impersonate a nutrition or licensing expert or invent authoritative standards.
+
+## Scenario 10: A job title is too broad
+
+```text
+My title is “Project Manager,” but it means very different work across companies. I repeatedly broke cross-functional requests into milestones, tracked risk, and moved delivery forward; the last three projects finished on time. Separate demonstrated assets, transfer hypotheses, and unverified boundaries instead of recommending a direction from the title alone.
+```
+
+The response should treat repeated requirement breakdown, risk tracking, and coordinated delivery as demonstrated assets. Their use in AI Product or Business Efficiency work is a transfer hypothesis. Model boundaries, prototype acceptance, and data-risk experience remain unverified. Give only one real task that can test the transfer hypothesis.
+
+## Scenario 11: Returning with an experience result
+
+```text
+I completed the minimum experience task: I built an internal form tool and successfully changed it for a colleague's new requirement. I can explain the change, but tests cover only normal input. Reuse the previous diagnosis, make the current stage decision, and give one next step.
+```
+
+Reuse the earlier diagnosis, add the new result as evidence, and do not repeat background questions. Based on the original target and remaining risk, choose exactly one: ready to enter a route, still needs comparison, build foundations first, or apply in the current role first. Only the route-ready decision hands off to Learning route; every other decision gives one evidence or foundation action.
+
+## Scenario 12: Asking about current salary and hiring windows
+
+```text
+What is the current salary for AI Product Managers in Shanghai? Is the next two months a hiring window? I have not supplied job samples; just give me the conclusion.
+```
+
+Without a verifiable source, publication date, Shanghai scope, and sample or method limitations, withhold a specific current salary or hiring-window claim. Structural guidance remains possible: collect comparable local postings, record salary definitions, publication dates, responsibilities, and sample bias, then decide whether the evidence changes the next action. Do not replace current data with general impressions.
 
 See the [Full Usage Guide](usage-guide.en.md) for output rules and [Getting Started](getting-started.en.md) for first use.
