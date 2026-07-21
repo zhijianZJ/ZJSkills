@@ -34,9 +34,9 @@ Choose exactly one mode for each user request.
 
 | Condition | Reference |
 |---|---|
-| The user needs a direction, fit, feasibility, expectation, or learning-support decision | `references/career-diagnosis.md` |
+| The user needs a direction, fit, feasibility, expectation, or learning-support decision, or returns with a minimum experience-task result from Career Diagnosis | `references/career-diagnosis.md` |
 | The direction is sufficiently clear and the user needs a route | `references/learning-route.md` |
-| The user is stuck, has new evidence, or needs the next learning action | `references/learning-help.md` |
+| The user is stuck, has new learning evidence other than a returned Career Diagnosis minimum experience-task result, or needs the next learning action | `references/learning-help.md` |
 | A career diagnosis requires comparing AI directions or a minimum experience task | `references/ai-career-map.md` |
 
 Do not load unrelated references. Read each selected reference completely before replying.

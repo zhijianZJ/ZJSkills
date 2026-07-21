@@ -354,8 +354,36 @@ class LightweightSkillTests(unittest.TestCase):
         ):
             self.assert_contract_phrase(skill, phrase)
 
+    def test_returned_diagnosis_result_routes_to_diagnosis_not_learning_help(self):
+        load_section = self.level_two_section(
+            read_runtime("SKILL.md"), "Load Only What Is Needed"
+        )
+        rows = [
+            line
+            for line in load_section.splitlines()
+            if line.startswith("|") and "references/" in line
+        ]
+        diagnosis_row = next(
+            line for line in rows if "references/career-diagnosis.md" in line
+        )
+        help_row = next(
+            line for line in rows if "references/learning-help.md" in line
+        )
+        self.assertIn(
+            "returns with a minimum experience-task result from Career Diagnosis",
+            diagnosis_row,
+        )
+        self.assertIn(
+            "other than a returned Career Diagnosis minimum experience-task result",
+            help_row,
+        )
+
     def test_learning_route_consumes_the_route_ready_handoff(self):
         route = read_runtime("references/learning-route.md")
+        self.assertIn(
+            "stage decision is `Route ready`",
+            route,
+        )
         for phrase in (
             "stage decision",
             "demonstrated assets",
