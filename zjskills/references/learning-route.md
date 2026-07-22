@@ -1,45 +1,58 @@
-# Learning Route
+# Personalized Learning Route
 
-Use this mode when the target direction is sufficiently clear or the user explicitly requests a route. Put outcomes and observable deliverables before resources. Build no more than three stages; use fewer when fewer are sufficient.
+Build the route only after selecting a target role or a bounded validation target. Reuse the user's demonstrated strengths and address the must-close gaps.
 
-## Route rules
+## Route design
 
-Suggest resources and learning support after the target, stage outcomes, evidence projects, and current action are clear. Explain the job each option serves. When outside guidance would materially improve feedback, correction, practice access, accountability, or structure, include it as a valid route component with selection and progress criteria.
+Use three or four stages depending on the target. Do not create a calendar that exceeds the user's stated capacity. If time, foundation, or deadline is unknown, state the assumption.
 
-Enter Learning Route from a Career Diagnosis handoff only when its stage decision is `Route ready`. Reuse its demonstrated assets, target direction, primary gap, and important constraint. Do not restart diagnosis. Show which existing asset each stage reuses when relevant.
+For every stage include:
 
-Default to a chat response. Save only when the user explicitly requests it, and create one Markdown route containing diagnosis, target, stages, current action, evidence, and an update log. Append observed results and route changes to that log. Do not create extra state files.
+- Capability outcome: what the user should be able to do.
+- Focus topics: the smallest set needed for the outcome.
+- Evidence project or artifact: what the user will produce.
+- Acceptance check: observable proof that the work meets the target.
+- Existing asset reused: how prior experience creates differentiation.
+- Emphasis: what deserves most attention for this user.
 
-Return the following headings in this exact order.
+Do not use course completion, watching videos, collecting prompts, or tool familiarity as the main evidence.
 
-## Target
+## Recommended stages
 
-Define the target result and the observable evidence that would count.
+### Stage 1: AI and role foundations
 
-## Current starting point
+Teach only the model, data, workflow, product, business, or engineering concepts needed to understand the target role. Include capability boundaries, common failures, and verification.
 
-State relevant demonstrated capability, experience, constraints, and important unknowns.
+### Stage 2: target-role core capability
 
-## Stage 1: capability and deliverable
+Develop the role's core work. Examples:
 
-Name the first missing capability and one deliverable that demonstrates it.
+- Engineering: programming, APIs, data handling, testing, debugging, deployment.
+- Product: discovery, model boundaries, prototypes, metrics, evaluation, acceptance.
+- Solution or delivery: customer problem framing, architecture literacy, demonstrations, implementation, adoption.
+- Operations or growth: research-to-distribution workflows, measurement, iteration, and business outcomes.
 
-## Stage 2: capability and deliverable
+### Stage 3: differentiated evidence project
 
-Name the next capability and deliverable. Omit this stage when Stage 1 reaches the target.
+Create a realistic project that combines AI capability with the user's industry or functional experience. It should solve a named problem for a plausible user and include failure handling, verification, and a clear explanation of decisions.
 
-## Stage 3: target-level deliverable
+### Stage 4: employment conversion
 
-Name the bounded target-level deliverable. Omit this stage when an earlier stage reaches the target.
+Prepare the resume, portfolio, project narrative, target-company list, interview evidence, and application rhythm. Omit this stage when the current goal is only a validation task.
 
-## Evidence project for each stage
+## Route output
 
-For every included stage, define one real or realistic project, its observable result, and the acceptance check. Do not substitute course completion for evidence.
+Return:
 
-## Only this week's action
+1. Target role and target evidence.
+2. Starting point and reusable strengths.
+3. Stage-by-stage route.
+4. One evidence project per stage.
+5. Items to emphasize.
+6. Items to defer or skip.
+7. This week's single action.
+8. Checkpoint that determines whether to continue, adjust, or reconsider.
 
-Give one capacity-aware action that moves the current stage forward and say what completion looks like.
+## Resource and support selection
 
-## Biggest assumption or constraint
-
-State the single factor most likely to change the route.
+Discuss resource types only after the route is clear and only when they help execute a stage. Explain the job each resource serves. When the user needs feedback, correction, accountability, project review, portfolio preparation, or interview practice, identify that learning mechanism explicitly. Do not turn the route into a course list or a provider recommendation unless the user asks for those options.
